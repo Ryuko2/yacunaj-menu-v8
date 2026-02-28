@@ -41,26 +41,38 @@ export default function MenuPage() {
   }
 
   return (
-    <div className="min-h-screen bg-coconut max-w-[430px] mx-auto shadow-2xl relative">
-      <Header />
+    <div
+      className="min-h-screen max-w-[430px] mx-auto shadow-2xl relative"
+      style={{
+        backgroundImage: "url('/images/menu_background.jpg')",
+        backgroundSize: 'cover',
+        backgroundAttachment: 'fixed',
+        backgroundPosition: 'center',
+      }}
+    >
+      <div className="min-h-screen bg-coconut/90">
+        <Header />
 
-      <div className="px-4 pt-2">
-        <div className="h-[180px] rounded-2xl overflow-hidden bg-sand mb-4">
-          <img
-            src="/images/hero_coffee.jpg"
-            alt="Yacunaj"
-            className="w-full h-full object-cover"
-            onError={(e) => { e.target.style.display = 'none' }}
-          />
-        </div>
+        <div className="px-4 pt-2">
+          <div className="w-full h-44 overflow-hidden rounded-2xl mb-4">
+            <img
+              src="/images/hero_coffee.jpg"
+              alt="Yacunaj Café"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null
+                e.target.src = '/images/hero_coffee.png'
+              }}
+            />
+          </div>
 
-        <CategoryNav activeCategory={activeCategory} onSelect={setActiveCategory} />
+          <CategoryNav activeCategory={activeCategory} onSelect={setActiveCategory} />
 
-        <div className="pb-24">
-          {menuCategories.map((cat) => (
-            <div key={cat.id} id={`cat-${cat.id}`}>
-              <MenuSection title={cat.name} emoji={cat.emoji}>
-                {cat.items.map((item) => (
+          <div className="pb-24">
+            {menuCategories.map((cat) => (
+              <div key={cat.id} id={`cat-${cat.id}`}>
+                <MenuSection title={cat.name} emoji={cat.emoji}>
+                  {cat.items.map((item) => (
                     <MenuCard
                       key={item.id}
                       item={item}
@@ -68,22 +80,23 @@ export default function MenuPage() {
                       onClick={openModal}
                     />
                   ))}
-              </MenuSection>
-            </div>
-          ))}
+                </MenuSection>
+              </div>
+            ))}
+          </div>
         </div>
+
+        <CartButton onClick={() => setCartOpen(true)} />
+        <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+
+        {modalProduct && modalCategory && (
+          <ProductModal
+            item={modalProduct}
+            category={modalCategory}
+            onClose={() => { setModalProduct(null); setModalCategory(null) }}
+          />
+        )}
       </div>
-
-      <CartButton onClick={() => setCartOpen(true)} />
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-
-      {modalProduct && modalCategory && (
-        <ProductModal
-          item={modalProduct}
-          category={modalCategory}
-          onClose={() => { setModalProduct(null); setModalCategory(null) }}
-        />
-      )}
     </div>
   )
 }
