@@ -1,44 +1,39 @@
 import { menuCategories } from '../../data/menu'
-
-const categoryImages = {
-  food: '/images/food_category.png',
-  snacks: '/images/food_category.png',
-  postres: '/images/desserts.png',
-  cafes: '/images/coffee_category.png',
-  cappuccinos: '/images/coffee_category.png',
-  lattes: '/images/coffee_category.png',
-  smoothies: '/images/cold_drinks.png',
-  sodas: '/images/cold_drinks.png',
-  tisanas: '/images/cold_drinks.png',
-  frappe: '/images/cold_drinks.png',
-  'otras-bebidas': '/images/cold_drinks.png',
-}
+import { CategoryIcon } from '../menu/CategoryIcon'
 
 export function CategoryNav({ activeCategory, onSelect }) {
   return (
-    <nav className="flex gap-2 overflow-x-auto py-4 px-4 -mx-4 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+    <nav
+      className="flex gap-2 overflow-x-auto py-4 px-4 -mx-4 scrollbar-hide"
+      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+    >
       {menuCategories.map((cat) => {
-        const imgSrc = categoryImages[cat.id]
+        const isActive = activeCategory === cat.id
         return (
           <button
             key={cat.id}
             onClick={() => onSelect(cat.id)}
-            className={`
-              flex-shrink-0 px-4 py-2 rounded-2xl font-medium text-sm transition-all flex items-center gap-1.5
-              ${activeCategory === cat.id
-                ? 'bg-palm text-coconut shadow-lg'
-                : 'bg-sand text-bark hover:bg-sunset-light/30'
-              }
-            `}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              background: isActive ? 'rgba(201,162,39,0.15)' : 'transparent',
+              border: `1px solid ${isActive ? '#C9A227' : 'rgba(201,162,39,0.2)'}`,
+              borderRadius: '2px',
+              color: isActive ? '#C9A227' : 'rgba(245,240,232,0.6)',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              whiteSpace: 'nowrap',
+              fontFamily: '"Jost", sans-serif',
+              fontSize: '0.75rem',
+              fontWeight: isActive ? 500 : 400,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              flexShrink: 0,
+            }}
           >
-            {imgSrc ? (
-              <>
-                <img src={imgSrc} alt="" className="w-5 h-5 object-contain" onError={(e) => { e.target.style.display = 'none'; e.target.nextElementSibling?.classList.remove('hidden') }} />
-                <span className="hidden">{cat.emoji}</span>
-              </>
-            ) : (
-              <span>{cat.emoji}</span>
-            )}
+            <CategoryIcon category={cat.id} size={14} />
             {cat.name}
           </button>
         )

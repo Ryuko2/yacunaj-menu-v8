@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useCartStore } from '../../store/cartStore'
+import { CategoryIcon } from './CategoryIcon'
 
 export function ProductModal({ item, category, onClose }) {
   const addItem = useCartStore(s => s.addItem)
@@ -9,9 +10,11 @@ export function ProductModal({ item, category, onClose }) {
   const [selectedIngredients, setSelectedIngredients] = useState([])
   const [notes, setNotes] = useState('')
 
-  const basePrice = item.price ?? item.basePrice ?? 0
+  const isVariable = item.price_type === 'variable' || (item.price == null && item.basePrice == null)
+
+  const basePrice = isVariable ? 0 : (item.price ?? item.basePrice ?? 0)
   const sizePrice = size?.price ?? 0
-  const effectiveBase = category?.hasSizes ? sizePrice : basePrice
+  const effectiveBase = category?.hasSizes && !isVariable ? sizePrice : basePrice
 
   const maxFree = category?.hasIngredients ? item.maxFreeIngredients ?? 0 : 0
   const extraPrice = item.extraPrice ?? 0
@@ -19,14 +22,13 @@ export function ProductModal({ item, category, onClose }) {
   const ingredientCost = extraCount * extraPrice
 
   const finalPrice = effectiveBase + ingredientCost
+  const canAdd = isVariable || (finalPrice > 0 && !Number.isNaN(finalPrice))
 
   const toggleIngredient = (ing) => {
     setSelectedIngredients(prev =>
       prev.includes(ing) ? prev.filter(i => i !== ing) : [...prev, ing]
     )
   }
-
-  const canAdd = finalPrice > 0 && !Number.isNaN(finalPrice)
 
   const handleAddToCart = () => {
     if (!canAdd) return
@@ -38,41 +40,82 @@ export function ProductModal({ item, category, onClose }) {
       ingredients: selectedIngredients.length ? selectedIngredients : undefined,
       notes: notes.trim() || undefined,
       quantity,
-      finalPrice,
+      finalPrice: isVariable ? 0 : finalPrice,
     }
     addItem(cartItem)
     onClose()
   }
 
+  const modalStyle = {
+    position: 'fixed', inset: 0, zIndex: 50,
+    display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+  }
+
+  const contentStyle = {
+    position: 'relative', zIndex: 1,
+    background: 'linear-gradient(180deg, #0D2010 0%, #0A1A0F 100%)',
+    border: '1px solid rgba(201,162,39,0.2)',
+    borderRadius: '8px 8px 0 0',
+    width: '100%', maxWidth: '28rem', maxHeight: '90vh',
+    overflowY: 'auto',
+  }
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center">
-      <div className="bg-coconut w-full max-w-md max-h-[90vh] overflow-y-auto rounded-t-3xl sm:rounded-3xl shadow-2xl">
-        <div className="sticky top-0 bg-coconut/95 backdrop-blur py-4 px-6 flex justify-between items-center border-b border-sand">
-          <h2 className="font-heading text-xl font-semibold text-palm">{item.name}</h2>
-          <button onClick={onClose} className="text-bark text-2xl hover:text-palm">×</button>
+    <div style={modalStyle} className="page-enter">
+      <div
+        style={{ position: 'absolute', inset: 0, background: 'rgba(5,16,8,0.85)', backdropFilter: 'blur(4px)' }}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <div style={contentStyle} onClick={e => e.stopPropagation()}>
+        <div style={{
+          padding: '1rem 1.5rem', borderBottom: '1px solid rgba(201,162,39,0.15)',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '36px', height: '36px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: 'rgba(201,162,39,0.08)', border: '1px solid rgba(201,162,39,0.2)', borderRadius: '3px',
+              color: '#C9A227',
+            }}>
+              <CategoryIcon category={category?.id} size={18} />
+            </div>
+            <h2 style={{
+              fontFamily: '"Cormorant Garamond", serif',
+              fontSize: '1.25rem', fontWeight: 600, color: '#F5F0E8',
+            }}>{item.name}</h2>
+          </div>
+          <button
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', color: 'rgba(245,240,232,0.7)', fontSize: '1.5rem', cursor: 'pointer' }}
+          >
+            ×
+          </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        <div style={{ padding: '1.5rem' }}>
           {item.description && (
-            <p className="text-bark/80">{item.description}</p>
+            <p style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.85rem', color: 'rgba(245,240,232,0.6)', marginBottom: '1.25rem' }}>
+              {item.description}
+            </p>
           )}
 
-          {category?.hasSizes && category.sizes?.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium text-bark mb-2">Tamaño</h3>
-              <div className="flex gap-2">
+          {category?.hasSizes && category.sizes?.length > 0 && !isVariable && (
+            <div style={{ marginBottom: '1.25rem' }}>
+              <h3 style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.75rem', fontWeight: 500, color: 'rgba(245,240,232,0.7)', marginBottom: '0.5rem', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Tamaño</h3>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
                 {category.sizes.map((s) => (
-                  <label key={s.id} className="flex-1 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="size"
-                      checked={size?.id === s.id}
-                      onChange={() => setSize(s)}
-                      className="sr-only peer"
-                    />
-                    <div className="p-3 rounded-xl border-2 border-sand text-center peer-checked:border-palm peer-checked:bg-palm/5">
-                      <span className="block font-medium text-bark">{s.label}</span>
-                      <span className="font-accent text-palm">${s.price}</span>
+                  <label key={s.id} style={{ flex: 1, cursor: 'pointer' }}>
+                    <input type="radio" name="size" checked={size?.id === s.id} onChange={() => setSize(s)} style={{ display: 'none' }} />
+                    <div style={{
+                      padding: '0.75rem', borderRadius: '4px', textAlign: 'center',
+                      border: size?.id === s.id ? '1px solid #C9A227' : '1px solid rgba(201,162,39,0.3)',
+                      background: size?.id === s.id ? 'rgba(201,162,39,0.1)' : 'transparent',
+                      color: size?.id === s.id ? '#C9A227' : 'rgba(245,240,232,0.7)',
+                    }}>
+                      <span style={{ display: 'block', fontFamily: '"Jost", sans-serif', fontWeight: 500 }}>{s.label}</span>
+                      <span style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.8rem' }}>${s.price}</span>
                     </div>
                   </label>
                 ))}
@@ -80,63 +123,71 @@ export function ProductModal({ item, category, onClose }) {
             </div>
           )}
 
-          {category?.hasIngredients && item.ingredients?.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium text-bark mb-2">
+          {category?.hasIngredients && item.ingredients?.length > 0 && !isVariable && (
+            <div style={{ marginBottom: '1.25rem' }}>
+              <h3 style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.75rem', fontWeight: 500, color: 'rgba(245,240,232,0.7)', marginBottom: '0.5rem' }}>
                 Ingredientes (primeros {maxFree} incluidos)
               </h3>
-              <div className="flex flex-wrap gap-2">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                 {item.ingredients.map((ing) => (
-                  <label key={ing} className="cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedIngredients.includes(ing)}
-                      onChange={() => toggleIngredient(ing)}
-                      className="sr-only peer"
-                    />
-                    <span className={`
-                      inline-block px-3 py-1.5 rounded-xl text-sm
-                      peer-checked:bg-palm peer-checked:text-coconut
-                      bg-sand text-bark
-                    `}>
+                  <label key={ing} style={{ cursor: 'pointer' }}>
+                    <input type="checkbox" checked={selectedIngredients.includes(ing)} onChange={() => toggleIngredient(ing)} style={{ display: 'none' }} />
+                    <span style={{
+                      display: 'inline-block', padding: '6px 12px', borderRadius: '4px', fontSize: '0.8rem',
+                      background: selectedIngredients.includes(ing) ? 'rgba(201,162,39,0.2)' : 'rgba(201,162,39,0.08)',
+                      border: `1px solid ${selectedIngredients.includes(ing) ? '#C9A227' : 'rgba(201,162,39,0.2)'}`,
+                      color: selectedIngredients.includes(ing) ? '#C9A227' : 'rgba(245,240,232,0.7)',
+                    }}>
                       {ing}
                     </span>
                   </label>
                 ))}
               </div>
               {extraCount > 0 && (
-                <p className="text-sm text-palm mt-2">
+                <p style={{ fontSize: '0.8rem', color: '#C9A227', marginTop: '0.5rem' }}>
                   +${extraCount * extraPrice} por {extraCount} ingrediente(s) extra
                 </p>
               )}
             </div>
           )}
 
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-bark mb-2">
-              📝 Preferencias / Notas
+          <div style={{ marginBottom: '1.25rem' }}>
+            <label style={{ display: 'block', fontFamily: '"Jost", sans-serif', fontSize: '0.75rem', fontWeight: 500, color: 'rgba(245,240,232,0.7)', marginBottom: '0.5rem' }}>
+              Preferencias / Notas
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Ej: sin cebolla, extra caliente, menos hielo, extra dulce..."
-              className="w-full rounded-xl border border-sand bg-coconut px-4 py-3 text-sm text-bark placeholder:text-bark/40 focus:outline-none focus:ring-2 focus:ring-palm resize-none"
+              placeholder="Ej: sin cebolla, extra caliente..."
+              style={{
+                width: '100%', padding: '0.75rem', borderRadius: '4px',
+                background: 'rgba(21,43,26,0.5)', border: '1px solid rgba(201,162,39,0.2)',
+                color: '#F5F0E8', resize: 'none', fontFamily: '"Jost", sans-serif', fontSize: '0.85rem',
+              }}
               rows={3}
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-10 h-10 rounded-xl bg-sand text-bark font-bold text-lg"
+                style={{
+                  width: '36px', height: '36px', borderRadius: '4px',
+                  background: 'rgba(201,162,39,0.1)', border: '1px solid rgba(201,162,39,0.3)',
+                  color: '#C9A227', fontSize: '1.2rem', cursor: 'pointer',
+                }}
               >
                 −
               </button>
-              <span className="font-accent text-xl w-8 text-center">{quantity}</span>
+              <span style={{ fontFamily: '"Jost", sans-serif', fontSize: '1.1rem', width: '2rem', textAlign: 'center', color: '#F5F0E8' }}>{quantity}</span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="w-10 h-10 rounded-xl bg-sand text-bark font-bold text-lg"
+                style={{
+                  width: '36px', height: '36px', borderRadius: '4px',
+                  background: 'rgba(201,162,39,0.1)', border: '1px solid rgba(201,162,39,0.3)',
+                  color: '#C9A227', fontSize: '1.2rem', cursor: 'pointer',
+                }}
               >
                 +
               </button>
@@ -144,11 +195,17 @@ export function ProductModal({ item, category, onClose }) {
             <button
               onClick={handleAddToCart}
               disabled={!canAdd}
-              className={`px-6 py-3 rounded-2xl font-accent font-bold transition-colors ${
-                canAdd ? 'bg-palm text-coconut hover:bg-palm-light' : 'bg-sand text-bark/50 cursor-not-allowed'
-              }`}
+              style={{
+                padding: '0.75rem 1.5rem', borderRadius: '4px',
+                background: canAdd ? 'linear-gradient(135deg, #C9A227, #D4AF37)' : 'rgba(201,162,39,0.2)',
+                border: 'none', color: canAdd ? '#0A1A0F' : 'rgba(245,240,232,0.4)',
+                fontFamily: '"Jost", sans-serif', fontSize: '0.85rem', fontWeight: 600,
+                letterSpacing: '0.1em', textTransform: 'uppercase', cursor: canAdd ? 'pointer' : 'not-allowed',
+              }}
             >
-              {canAdd ? `Agregar — $${(finalPrice * quantity).toFixed(0)}` : 'Consultar precio'}
+              {canAdd
+                ? (isVariable ? `Agregar${quantity > 1 ? ` (${quantity})` : ''}` : `Agregar — $${(finalPrice * quantity).toFixed(0)}`)
+                : 'Consultar precio'}
             </button>
           </div>
         </div>

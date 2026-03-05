@@ -18,6 +18,7 @@ export function OrderSummary({ onClose }) {
 
   const navigate = useNavigate()
   const total = getTotal()
+  const hasVariableItems = items.some(i => i.finalPrice === 0)
 
   const handlePlaceOrder = async () => {
     if (!tableNumber || !qrToken) {
@@ -41,25 +42,54 @@ export function OrderSummary({ onClose }) {
   }
 
   return (
-    <div className="p-4 border-t border-sand bg-sand/30 rounded-b-2xl">
-      <div className="mb-3">
-        <label className="text-sm text-bark block mb-1">Notas para la cocina</label>
+    <div style={{
+      padding: '1.25rem 1.5rem',
+      borderTop: '1px solid rgba(201,162,39,0.15)',
+      background: 'rgba(21,43,26,0.5)',
+    }}>
+      <div style={{ marginBottom: '0.75rem' }}>
+        <label style={{ display: 'block', fontFamily: '"Jost", sans-serif', fontSize: '0.75rem', color: 'rgba(245,240,232,0.7)', marginBottom: '0.25rem' }}>
+          Notas para la cocina
+        </label>
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Opcional"
-          className="w-full p-2 rounded-xl border border-sand bg-white text-sm resize-none h-14"
+          style={{
+            width: '100%', padding: '0.5rem 0.75rem', borderRadius: '4px',
+            background: 'rgba(10,26,15,0.5)', border: '1px solid rgba(201,162,39,0.2)',
+            color: '#F5F0E8', resize: 'none', fontFamily: '"Jost", sans-serif', fontSize: '0.85rem', minHeight: '2.5rem',
+          }}
         />
       </div>
-      {error && <p className="text-red-600 text-sm mb-2">{error}</p>}
-      <div className="flex justify-between items-center mb-3">
-        <span className="font-accent font-bold text-palm text-lg">Total</span>
-        <span className="font-accent font-bold text-palm text-xl">${total.toFixed(0)}</span>
+      {error && <p style={{ color: '#E8845A', fontSize: '0.8rem', marginBottom: '0.5rem' }}>{error}</p>}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+        <span style={{ fontFamily: '"Cormorant Garamond", serif', fontWeight: 600, fontSize: '1.1rem', color: '#F5F0E8' }}>
+          Total
+        </span>
+        <span style={{ fontFamily: '"Jost", sans-serif', fontWeight: 600, fontSize: '1.2rem', color: '#C9A227' }}>
+          ${total.toFixed(0)}
+          {hasVariableItems && total === 0 && (
+            <span style={{ fontSize: '0.7rem', fontWeight: 400, color: 'rgba(245,240,232,0.6)', marginLeft: '4px' }}>
+              (variable)
+            </span>
+          )}
+        </span>
       </div>
       <button
         onClick={handlePlaceOrder}
         disabled={loading}
-        className="w-full py-3 rounded-2xl bg-palm text-coconut font-accent font-bold hover:bg-palm-light transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+        style={{
+          width: '100%', padding: '1rem',
+          background: 'linear-gradient(135deg, #C9A227, #D4AF37)',
+          border: 'none', borderRadius: '4px',
+          color: '#0A1A0F', fontFamily: '"Jost", sans-serif',
+          fontSize: '0.85rem', fontWeight: 600,
+          letterSpacing: '0.15em', textTransform: 'uppercase',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          opacity: loading ? 0.7 : 1,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+        }}
       >
         {loading ? <><LoadingSpinner size="sm" /> Enviando...</> : 'Confirmar Pedido'}
       </button>

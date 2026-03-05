@@ -1,20 +1,43 @@
 @import "tailwindcss";
 
+/* ============================================
+   YACUNAJ — PREMIUM TROPICAL DESIGN SYSTEM
+   ============================================ */
+
 @theme {
-  --color-palm: #2D5016;
-  --color-palm-light: #4A7C2F;
-  --color-sand: #F5E6C8;
-  --color-coconut: #FDFAF4;
-  --color-bark: #8B5E3C;
-  --color-sunset: #E8845A;
-  --color-sunset-light: #F4A57A;
-  --color-mayan: #1A3A0A;
+  /* Fondo principal — verde selva profunda */
+  --color-bg-deep: #0A1A0F;
+  --color-bg-primary: #0D2010;
+  --color-bg-card: #152B1A;
+  --color-bg-card-hover: #1C3822;
+  /* Acentos dorado/ámbar */
+  --color-gold: #C9A227;
+  --color-gold-light: #D4AF37;
+  --color-gold-muted: rgba(201, 162, 39, 0.15);
+  /* Textos */
+  --color-text-ivory: #F5F0E8;
+  --color-text-muted: #8FAF8A;
+  --color-text-dim: rgba(245, 240, 232, 0.5);
+  /* Bordes */
+  --color-border: rgba(201, 162, 39, 0.2);
+  --color-border-card: rgba(201, 162, 39, 0.12);
+  /* Estados */
+  --color-success: #4CAF6F;
+  --color-variable-tag: rgba(201, 162, 39, 0.2);
+  /* Legacy (compat) */
+  --color-palm: #C9A227;
+  --color-palm-light: #D4AF37;
+  --color-coconut: #0D2010;
+  --color-sand: #152B1A;
+  --color-bark: #8FAF8A;
+  --color-mayan: #0A1A0F;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, sans-serif;
-  background-color: #FDFAF4;
+  font-family: 'Jost', system-ui, sans-serif;
+  background-color: #0A1A0F;
+  color: #F5F0E8;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -24,22 +47,70 @@ body {
 }
 
 .font-accent {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Jost', system-ui, sans-serif;
 }
+
+/* Scrollbar estilizada */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #0A1A0F; }
+::-webkit-scrollbar-thumb { background: rgba(201,162,39,0.3); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(201,162,39,0.5); }
+
+::selection { background: rgba(201,162,39,0.2); color: #F5F0E8; }
+
+html { scroll-behavior: smooth; }
+
+/* ============================================
+   ANIMACIONES DE HOJAS — PROYECTO KIWI
+   ============================================ */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-15px); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50%       { transform: rotate(3deg); }
+}
+
+@keyframes leafDrift {
+  0%   { transform: translateY(-60px) rotate(-5deg); opacity: 0; }
+  10%  { opacity: 0.5; }
+  85%  { opacity: 0.35; }
+  100% { transform: translateY(110vh) rotate(20deg); opacity: 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(201,162,39,0.3)); }
+  50%       { filter: drop-shadow(0 0 20px rgba(201,162,39,0.6)); }
+}
+
+.animate-float { animation: float 4s ease-in-out infinite; }
+.animate-sway  { animation: sway 3s ease-in-out infinite; }
+
+.leaf-delay-1 { animation-delay: 0s; }
+.leaf-delay-2 { animation-delay: 0.7s; }
+.leaf-delay-3 { animation-delay: 1.4s; }
+.leaf-delay-4 { animation-delay: 2.1s; }
+.leaf-delay-5 { animation-delay: 2.8s; }
+
+/* Transición de entrada */
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter { animation: pageEnter 0.4s ease-out forwards; }
 
 @keyframes slide-up {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+.animate-slide-up { animation: slide-up 0.3s ease-out; }
 
-.animate-slide-up {
-  animation: slide-up 0.3s ease-out;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

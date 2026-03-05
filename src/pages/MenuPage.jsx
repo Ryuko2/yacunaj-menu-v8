@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Header } from '../components/layout/Header'
+import { MenuHeader } from '../components/layout/MenuHeader'
 import { CategoryNav } from '../components/layout/CategoryNav'
 import { CartButton } from '../components/layout/CartButton'
 import { CartDrawer } from '../components/cart/CartDrawer'
 import { MenuSection } from '../components/menu/MenuSection'
 import { MenuCard } from '../components/menu/MenuCard'
 import { ProductModal } from '../components/menu/ProductModal'
+import { FallingLeaves } from '../components/menu/FallingLeaves'
 import { useTableValidation } from '../hooks/useTableValidation'
 import { menuCategories } from '../data/menu'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
@@ -17,9 +18,19 @@ export default function MenuPage() {
   const [modalProduct, setModalProduct] = useState(null)
   const [modalCategory, setModalCategory] = useState(null)
 
+  const openModal = (item, category) => {
+    setModalProduct(item)
+    setModalCategory(category)
+  }
+
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-coconut">
+      <div
+        style={{
+          minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#0A1A0F',
+        }}
+      >
         <LoadingSpinner size="lg" />
       </div>
     )
@@ -27,76 +38,67 @@ export default function MenuPage() {
 
   if (status === 'invalid') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-coconut p-6">
-        <h1 className="font-heading text-2xl text-palm mb-2">Acceso no válido</h1>
-        <p className="text-bark text-center">Escanea el código QR de tu mesa para ver el menú.</p>
-        <p className="text-sm text-bark/70 mt-4">URL correcta: /order?table=1&token=tok_t1_abc123</p>
+      <div
+        style={{
+          minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+          background: '#0A1A0F', padding: '1.5rem',
+        }}
+      >
+        <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.5rem', color: '#C9A227', marginBottom: '0.5rem' }}>
+          Acceso no válido
+        </h1>
+        <p style={{ fontFamily: '"Jost", sans-serif', color: 'rgba(245,240,232,0.7)', textAlign: 'center' }}>
+          Escanea el código QR de tu mesa para ver el menú.
+        </p>
+        <p style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.8rem', color: 'rgba(245,240,232,0.5)', marginTop: '1rem' }}>
+          URL correcta: /order?table=1&token=tok_t1_abc123
+        </p>
       </div>
     )
   }
 
-  const openModal = (item, category) => {
-    setModalProduct(item)
-    setModalCategory(category)
-  }
-
   return (
     <div
-      className="min-h-screen max-w-[430px] mx-auto shadow-2xl relative"
       style={{
-        backgroundImage: "url('/images/menu_background.jpg')",
-        backgroundSize: 'cover',
-        backgroundAttachment: 'fixed',
-        backgroundPosition: 'center',
+        minHeight: '100vh', maxWidth: 430, margin: '0 auto',
+        background: 'linear-gradient(180deg, #0A1A0F 0%, #0D2010 50%, #0A1A0F 100%)',
+        position: 'relative',
       }}
     >
-      <div className="min-h-screen bg-coconut/90">
-        <Header />
+      <FallingLeaves />
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <MenuHeader />
 
-        <div className="px-4 pt-2">
-          <div className="w-full h-44 overflow-hidden rounded-2xl mb-4">
-            <img
-              src="/images/hero_coffee.jpg"
-              alt="Yacunaj Café"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.onerror = null
-                e.target.src = '/images/hero_coffee.png'
-              }}
-            />
-          </div>
-
+        <div style={{ padding: '0 1rem 6rem' }}>
           <CategoryNav activeCategory={activeCategory} onSelect={setActiveCategory} />
 
-          <div className="pb-24">
-            {menuCategories.map((cat) => (
-              <div key={cat.id} id={`cat-${cat.id}`}>
-                <MenuSection title={cat.name} emoji={cat.emoji}>
-                  {cat.items.map((item) => (
-                    <MenuCard
-                      key={item.id}
-                      item={item}
-                      category={cat}
-                      onClick={openModal}
-                    />
-                  ))}
-                </MenuSection>
-              </div>
-            ))}
-          </div>
+          {menuCategories.map((cat) => (
+            <div key={cat.id} id={`cat-${cat.id}`}>
+              <MenuSection title={cat.name} categoryId={cat.id}>
+                {cat.items.map((item) => (
+                  <MenuCard
+                    key={item.id}
+                    item={item}
+                    category={cat}
+                    onClick={openModal}
+                  />
+                ))}
+              </MenuSection>
+            </div>
+          ))}
         </div>
-
-        <CartButton onClick={() => setCartOpen(true)} />
-        <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-
-        {modalProduct && modalCategory && (
-          <ProductModal
-            item={modalProduct}
-            category={modalCategory}
-            onClose={() => { setModalProduct(null); setModalCategory(null) }}
-          />
-        )}
       </div>
+
+      <CartButton onClick={() => setCartOpen(true)} />
+      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+
+      {modalProduct && modalCategory && (
+        <ProductModal
+          item={modalProduct}
+          category={modalCategory}
+          onClose={() => { setModalProduct(null); setModalCategory(null) }}
+        />
+      )}
     </div>
   )
 }
