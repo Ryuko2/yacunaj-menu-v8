@@ -14,7 +14,7 @@ function formatItems(items) {
   }).join('\n\n')
 }
 
-async function sendTelegramMessage(order, items) {
+export async function sendTelegramMessage(order, items) {
   const time = new Date(order.created_at || new Date()).toLocaleTimeString('es-MX', {
     hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'America/Merida'
   })
@@ -44,18 +44,20 @@ async function sendTelegramMessage(order, items) {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' }),
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: message,
+          parse_mode: 'Markdown'
+        }),
       }
     )
     const result = await response.json()
     if (!result.ok) {
-      console.error('Telegram API error:', result)
+      console.error('Telegram API error:', JSON.stringify(result))
     } else {
-      console.log('Telegram sent OK ✅')
+      console.log('Telegram sent OK ✅ message_id:', result.result?.message_id)
     }
   } catch (err) {
     console.error('Telegram fetch failed:', err.message)
   }
 }
-
-module.exports = { sendTelegramMessage }

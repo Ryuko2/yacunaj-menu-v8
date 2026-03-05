@@ -1,4 +1,4 @@
-const { supabase } = require('../../_supabase')
+import { supabase } from '../../_supabase.js'
 
 function getIdFromRequest(req) {
   if (req.query && req.query.id) return req.query.id
@@ -7,12 +7,16 @@ function getIdFromRequest(req) {
   return match ? match[1] : null
 }
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'PATCH, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Content-Type', 'application/json')
+
   if (req.method === 'OPTIONS') return res.status(200).end()
-  if (req.method !== 'PATCH') return res.status(405).json({ error: 'Method not allowed' })
+  if (req.method !== 'PATCH') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
 
   try {
     const id = getIdFromRequest(req)
