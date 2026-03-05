@@ -72,20 +72,22 @@ export default function MenuPage() {
         <div style={{ padding: '0 1rem 6rem' }}>
           <CategoryNav activeCategory={activeCategory} onSelect={setActiveCategory} />
 
-          {menuCategories.map((cat) => (
-            <div key={cat.id} id={`cat-${cat.id}`}>
-              <MenuSection title={cat.name} categoryId={cat.id}>
-                {cat.items.map((item) => (
-                  <MenuCard
-                    key={item.id}
-                    item={item}
-                    category={cat}
-                    onClick={openModal}
-                  />
-                ))}
-              </MenuSection>
-            </div>
-          ))}
+          {menuCategories
+            .filter((cat) => cat.id === activeCategory)
+            .map((cat) => (
+              <div key={cat.id} id={`cat-${cat.id}`}>
+                <MenuSection title={cat.name} categoryId={cat.id}>
+                  {cat.items.map((item) => (
+                    <MenuCard
+                      key={item.id}
+                      item={item}
+                      category={cat}
+                      onClick={openModal}
+                    />
+                  ))}
+                </MenuSection>
+              </div>
+            ))}
         </div>
       </div>
 
