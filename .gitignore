@@ -1,7 +1,14 @@
 node_modules/
+# Environment variables — NUNCA subir al repo
 .env
 .env.local
+.env.development
 .env.production
+.env.*.local
+
+# Vercel
+.vercel
+
 dist/
 .DS_Store
 *.log

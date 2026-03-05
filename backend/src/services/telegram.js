@@ -1,7 +1,11 @@
 const axios = require('axios')
 
-const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8404664187:AAEGbQRDU0fDLzjFwb1xt8jYg3hhq68PXdo'
-const CHAT_ID = process.env.TELEGRAM_CHAT_ID || '-5229285277'
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
+const CHAT_ID = process.env.TELEGRAM_CHAT_ID
+
+if (!BOT_TOKEN || !CHAT_ID) {
+  console.warn('[Telegram] Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID env vars')
+}
 
 function formatItems(items) {
   return items.map(item => {
@@ -15,6 +19,10 @@ function formatItems(items) {
 }
 
 async function sendTelegramMessage(order, items) {
+  if (!BOT_TOKEN || !CHAT_ID) {
+    console.warn('[Telegram] Skipping send — credentials not configured')
+    return
+  }
   const time = new Date(order.created_at || new Date()).toLocaleTimeString('es-MX', {
     hour: '2-digit',
     minute: '2-digit',
