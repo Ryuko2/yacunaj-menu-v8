@@ -11,12 +11,15 @@ export function useTableValidation() {
     const table = searchParams.get('table')
     const token = searchParams.get('token')
 
+    console.log('[TableValidation] table:', table, 'token:', token)
+
     if (!table || !token) {
       setStatus('invalid')
       return
     }
 
     setTable(table, token)
+    console.log('[TableValidation] setTable called ✅')
     setStatus('valid')
   }, [searchParams, setTable])
 

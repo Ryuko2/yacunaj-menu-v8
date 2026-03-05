@@ -5,13 +5,29 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-export async function placeOrder(tableNumber, qrToken, items, notes) {
-  const { data } = await api.post('/api/order', {
-    table_number: tableNumber,
-    qr_token: qrToken,
-    items,
-    notes,
+export async function placeOrder(tableNumber, qrToken, items, notes = '') {
+  const base = import.meta.env.VITE_API_URL || ''
+  const url = base ? `${base}/api/order` : '/api/order'
+  console.log('[placeOrder] sending:', { tableNumber, qrToken, itemCount: items.length })
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      table_number: tableNumber,
+      qr_token: qrToken,
+      items,
+      notes,
+    }),
   })
+
+  const data = await res.json()
+  console.log('[placeOrder] response:', res.status, data)
+
+  if (!res.ok) {
+    throw new Error(data?.error || data?.detail || `HTTP ${res.status}`)
+  }
+
   return data
 }
 

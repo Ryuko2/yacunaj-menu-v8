@@ -145,11 +145,11 @@ export function OrderSummary({ onClose }) {
       clearCart()
       setSuccessData({ orderNumber: order_number, tableNumber })
     } catch (err) {
-      console.error('Order error:', err)
+      console.error('[OrderSummary] error completo:', err)
       setError(
-        err?.response?.data?.error ||
         err?.message ||
-        'Error al enviar el pedido. Intenta de nuevo.'
+        err?.response?.data?.error ||
+        'Error desconocido al enviar el pedido'
       )
     } finally {
       setLoading(false)
