@@ -7,7 +7,7 @@ const api = axios.create({
 
 export async function placeOrder(tableNumber, qrToken, items, notes = '') {
   const base = import.meta.env.VITE_API_URL || ''
-  const url = base ? `${base}/api/order` : '/api/order'
+  const url = base ? `${base}/api/create-order` : '/api/create-order'
   console.log('[placeOrder] sending:', { tableNumber, qrToken, itemCount: items.length })
 
   const res = await fetch(url, {

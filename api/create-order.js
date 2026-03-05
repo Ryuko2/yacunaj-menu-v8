@@ -8,6 +8,7 @@ function generateOrderNumber() {
 }
 
 module.exports = async function handler(req, res) {
+  res.setHeader('Content-Type', 'application/json')
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
@@ -15,7 +16,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   try {
-    const { table_number, qr_token, items, notes } = req.body
+    const { table_number, qr_token, items, notes } = req.body || {}
     const { data: tableData, error: tableError } = await supabase
       .from('tables').select('*')
       .eq('table_number', parseInt(table_number))
