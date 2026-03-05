@@ -70,3 +70,33 @@ export async function sendTelegramMessage(order, items) {
     console.error('Telegram fetch failed:', err.message)
   }
 }
+
+/** Send raw text (for bill/request notifications, not orders) */
+export async function sendTelegramRawMessage(text) {
+  if (!BOT_TOKEN || !CHAT_ID) {
+    console.warn('[Telegram] Skipping send — credentials not configured')
+    return
+  }
+  try {
+    const response = await fetch(
+      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text,
+          parse_mode: 'Markdown'
+        }),
+      }
+    )
+    const result = await response.json()
+    if (!result.ok) {
+      console.error('Telegram API error:', JSON.stringify(result))
+    } else {
+      console.log('Telegram raw sent OK ✅')
+    }
+  } catch (err) {
+    console.error('Telegram fetch failed:', err.message)
+  }
+}
