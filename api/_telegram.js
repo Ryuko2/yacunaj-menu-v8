@@ -16,41 +16,26 @@ function formatItems(items) {
 
 async function sendTelegramMessage(order, items) {
   const time = new Date(order.created_at || new Date()).toLocaleTimeString('es-MX', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'America/Merida'
+    hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'America/Merida'
   })
-
   const message = [
     `🧾 *NUEVO PEDIDO – YACUNAJ* 🌴`,
-    `_(Amor en Maya)_`,
-    ``,
+    `_(Amor en Maya)_`, ``,
     `🪑 *Mesa:* ${order.table_number}`,
     `📋 *Pedido #:* ${order.order_number}`,
-    `🕐 *Hora:* ${time}`,
-    ``,
+    `🕐 *Hora:* ${time}`, ``,
     `━━━━━━━━━━━━━━━━`,
     formatItems(items),
-    `━━━━━━━━━━━━━━━━`,
-    ``,
+    `━━━━━━━━━━━━━━━━`, ``,
     `💰 *TOTAL: $${Number(order.total).toFixed(2)} MXN*`
   ].join('\n')
-
   try {
-    const response = await axios.post(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
-      {
-        chat_id: CHAT_ID,
-        text: message,
-        parse_mode: 'Markdown',
-      }
-    )
-    console.log('✅ Telegram notification sent')
-    return response.data
+    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      chat_id: CHAT_ID, text: message, parse_mode: 'Markdown'
+    })
+    console.log('✅ Telegram sent')
   } catch (err) {
     console.error('❌ Telegram error:', err.response?.data || err.message)
-    // Don't throw — order still succeeds even if Telegram fails
   }
 }
 

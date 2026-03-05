@@ -13,13 +13,14 @@ router.post('/order', async (req, res) => {
     const { data: tableData, error: tableError } = await supabase
       .from('tables')
       .select('*')
-      .eq('table_number', table_number)
+      .eq('table_number', parseInt(table_number))
       .eq('qr_token', qr_token)
       .eq('active', true)
       .single()
 
     if (tableError || !tableData) {
-      return res.status(403).json({ error: 'Invalid table token' })
+      console.error('Token validation failed:', { table_number, qr_token, tableError })
+      return res.status(403).json({ error: 'Invalid table token', detail: tableError?.message })
     }
 
     const total = items.reduce((sum, item) => sum + (item.finalPrice * item.quantity), 0)
