@@ -1,13 +1,12 @@
-import { menuCategories } from '../../data/menu'
 import { CategoryIcon } from '../menu/CategoryIcon'
 
-export function CategoryNav({ activeCategory, onSelect }) {
+export function CategoryNav({ categories = [], activeCategory, onSelect }) {
   return (
     <nav
       className="flex gap-2 overflow-x-auto py-4 px-4 -mx-4 scrollbar-hide"
       style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
     >
-      {menuCategories.map((cat) => {
+      {categories.map((cat) => {
         const isActive = activeCategory === cat.id
         return (
           <button

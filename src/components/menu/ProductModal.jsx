@@ -95,6 +95,19 @@ export function ProductModal({ item, category, onClose }) {
         </div>
 
         <div style={{ padding: '1.5rem' }}>
+          {item.image_url && (
+            <div style={{
+              width: '100%', height: '200px', borderRadius: '6px 6px 0 0',
+              overflow: 'hidden', marginBottom: '1rem', margin: '-1.5rem -1.5rem 1rem -1.5rem',
+            }}>
+              <img
+                src={item.image_url}
+                alt={item.name}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                onError={(e) => { e.target.style.display = 'none' }}
+              />
+            </div>
+          )}
           {item.description && (
             <p style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.85rem', color: 'rgba(245,240,232,0.6)', marginBottom: '1.25rem' }}>
               {item.description}

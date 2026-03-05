@@ -8,12 +8,15 @@ import { MenuCard } from '../components/menu/MenuCard'
 import { ProductModal } from '../components/menu/ProductModal'
 import { FallingLeaves } from '../components/menu/FallingLeaves'
 import { useTableValidation } from '../hooks/useTableValidation'
-import { menuCategories } from '../data/menu'
+import { useMenuItems } from '../hooks/useMenuItems'
+import { menuCategories as staticCategories } from '../data/menu'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 
 export default function MenuPage() {
   const status = useTableValidation()
-  const [activeCategory, setActiveCategory] = useState(menuCategories[0]?.id ?? 'food')
+  const { categories: menuCategories, loading: menuLoading } = useMenuItems()
+  const categories = (menuCategories?.length > 0 ? menuCategories : staticCategories)
+  const [activeCategory, setActiveCategory] = useState(categories[0]?.id ?? 'food')
   const [cartOpen, setCartOpen] = useState(false)
   const [modalProduct, setModalProduct] = useState(null)
   const [modalCategory, setModalCategory] = useState(null)
@@ -23,7 +26,7 @@ export default function MenuPage() {
     setModalCategory(category)
   }
 
-  if (status === 'loading') {
+  if (status === 'loading' || menuLoading) {
     return (
       <div
         style={{
@@ -70,9 +73,9 @@ export default function MenuPage() {
         <MenuHeader />
 
         <div style={{ padding: '0 1rem 6rem' }}>
-          <CategoryNav activeCategory={activeCategory} onSelect={setActiveCategory} />
+          <CategoryNav categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
 
-          {menuCategories
+          {categories
             .filter((cat) => cat.id === activeCategory)
             .map((cat) => (
               <div key={cat.id} id={`cat-${cat.id}`}>
