@@ -1,5 +1,18 @@
 @import "tailwindcss";
 
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-sizing: border-box;
+}
+button, [role="button"] {
+  min-height: 44px;
+  cursor: pointer;
+}
+input, select, textarea {
+  font-size: 16px !important;
+}
+
 /* ============================================
    YACUNAJ — PREMIUM TROPICAL DESIGN SYSTEM
    ============================================ */
