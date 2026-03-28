@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS tables (
   table_number INTEGER NOT NULL UNIQUE,
   qr_token TEXT NOT NULL UNIQUE,
   active BOOLEAN DEFAULT true,
+  label TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -22,19 +23,22 @@ CREATE TABLE IF NOT EXISTS orders (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Seed sample tables with QR tokens
-INSERT INTO tables (table_number, qr_token) VALUES
-  (1, 'tok_t1_abc123'),
-  (2, 'tok_t2_def456'),
-  (3, 'tok_t3_ghi789'),
-  (4, 'tok_t4_jkl012'),
-  (5, 'tok_t5_mno345'),
-  (6, 'tok_t6_pqr678'),
-  (7, 'tok_t7_stu901'),
-  (8, 'tok_t8_vwx234'),
-  (9, 'tok_t9_yza567'),
-  (10, 'tok_t10_bcd890')
-ON CONFLICT (table_number) DO NOTHING;
+-- Seed tables (tokens match api/create-order.js FALLBACK_TOKENS + Staff POS TOKENS)
+INSERT INTO tables (table_number, qr_token, active, label) VALUES
+  (1,  'tok_t1_abc123',   true, 'Mesa 1'),
+  (2,  'tok_t2_bcd234',   true, 'Mesa 2'),
+  (3,  'tok_t3_cde345',   true, 'Mesa 3'),
+  (4,  'tok_t4_def456',   true, 'Mesa 4'),
+  (5,  'tok_t5_efg567',   true, 'Mesa 5'),
+  (6,  'tok_t6_fgh678',   true, 'Mesa 6'),
+  (7,  'tok_t7_ghi789',   true, 'Mesa 7'),
+  (8,  'tok_t8_hij890',   true, 'Mesa 8'),
+  (9,  'tok_t9_ijk901',   true, 'Mesa 9'),
+  (10, 'tok_t10_bcd890',  true, 'Mesa 10')
+ON CONFLICT (table_number) DO UPDATE SET
+  qr_token = EXCLUDED.qr_token,
+  active   = EXCLUDED.active,
+  label    = COALESCE(EXCLUDED.label, tables.label);
 
 -- Enable realtime for orders (or enable in Supabase Dashboard > Database > Replication)
 ALTER PUBLICATION supabase_realtime ADD TABLE orders;
