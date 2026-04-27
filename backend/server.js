@@ -10,8 +10,10 @@ app.use(cors({
 }))
 app.use(express.json())
 
+app.use('/api', require('./src/routes/legacyPinAdmin'))
 app.use('/api', require('./src/routes/orders'))
 app.use('/api', require('./src/routes/tables'))
+app.use('/api', require('./src/routes/menu'))
 
 app.listen(process.env.PORT || 3001, () => {
   console.log(`🌴 Yacunaj API running on port ${process.env.PORT || 3001}`)

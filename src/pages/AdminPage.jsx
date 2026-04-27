@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { useOrders } from '../hooks/useOrders'
 import { SalesStats } from '../components/admin/SalesStats'
 import { OrderCard } from '../components/admin/OrderCard'
@@ -37,8 +38,9 @@ const styles = {
 }
 
 function exportToCSV(orders) {
+  const list = Array.isArray(orders) ? orders : []
   const headers = ['order_number', 'table_number', 'total', 'status', 'created_at']
-  const rows = orders.map(o => [o.order_number, o.table_number, o.total, o.status, new Date(o.created_at).toLocaleString('es-MX')])
+  const rows = list.map(o => [o.order_number, o.table_number, o.total, o.status, new Date(o.created_at).toLocaleString('es-MX')])
   const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const a = document.createElement('a')
@@ -387,10 +389,46 @@ export default function AdminPage() {
         <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.5rem', color: styles.gold, letterSpacing: '0.1em' }}>
           YACUNAJ — Admin
         </h1>
-        <button onClick={handleLogout} style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: `1px solid ${styles.border}`, borderRadius: 4, color: styles.muted, fontSize: '0.8rem', cursor: 'pointer' }}>
-          Cerrar sesión
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <Link
+            to="/app/menu/items"
+            style={{
+              padding: '0.45rem 0.9rem',
+              borderRadius: 4,
+              fontSize: '0.8rem',
+              fontFamily: '"Jost", sans-serif',
+              fontWeight: 600,
+              background: `linear-gradient(135deg, ${styles.gold}, #D4AF37)`,
+              color: '#0A1A0F',
+              textDecoration: 'none',
+            }}
+          >
+            CMS OPS — menú completo
+          </Link>
+          <button onClick={handleLogout} style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: `1px solid ${styles.border}`, borderRadius: 4, color: styles.muted, fontSize: '0.8rem', cursor: 'pointer' }}>
+            Cerrar sesión
+          </button>
+        </div>
       </header>
+
+      <div
+        style={{
+          marginBottom: '1.25rem',
+          padding: '0.75rem 1rem',
+          background: 'rgba(201,162,39,0.08)',
+          border: `1px solid ${styles.border}`,
+          borderRadius: 6,
+          fontFamily: '"Jost", sans-serif',
+          fontSize: '0.8rem',
+          color: styles.muted,
+          lineHeight: 1.45,
+        }}
+      >
+        El menú rápido de esta pantalla usa PIN y <code style={{ color: styles.gold }}>/api/admin-menu</code>.
+        Para categorías, modificadores, precios con auditoría e imágenes WebP usa el{' '}
+        <Link to="/app/menu/items" style={{ color: styles.gold, fontWeight: 600 }}>CMS Yacunaj OPS</Link>
+        {' '}(inicia sesión con el correo del staff; si no entra, pide rol <code style={{ color: styles.gold }}>owner</code> o <code style={{ color: styles.gold }}>manager</code> en Supabase → <code style={{ color: styles.gold }}>profiles</code>).
+      </div>
 
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
         <button

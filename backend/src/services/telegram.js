@@ -30,11 +30,15 @@ async function sendTelegramMessage(order, items) {
     timeZone: 'America/Merida'
   })
 
+  const sourceLine = order.source
+    ? `\n📍 *Origen:* ${String(order.source).replace(/_/g, ' ')}`
+    : ''
+
   const message = [
     `🧾 *NUEVO PEDIDO – YACUNAJ* 🌴`,
     `_(Amor en Maya)_`,
     ``,
-    `🪑 *Mesa:* ${order.table_number}`,
+    `🪑 *Mesa:* ${order.table_number}${sourceLine}`,
     `📋 *Pedido #:* ${order.order_number}`,
     `🕐 *Hora:* ${time}`,
     ``,

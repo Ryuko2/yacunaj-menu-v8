@@ -1,0 +1,7 @@
+{
+  "name": "@yacunaj/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "description": "Handlers puros compartidos entre Vercel /api y Express /backend"
+}

@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useCartStore } from '../../store/cartStore'
 import { CategoryIcon } from './CategoryIcon'
 
-export function ProductModal({ item, category, onClose }) {
-  const addItem = useCartStore(s => s.addItem)
+export function ProductModal({ item, category, onClose, onAddToCart }) {
+  const storeAddItem = useCartStore(s => s.addItem)
 
   const [quantity, setQuantity] = useState(1)
   const [size, setSize] = useState(category?.sizes?.[0])
@@ -32,8 +32,16 @@ export function ProductModal({ item, category, onClose }) {
 
   const handleAddToCart = () => {
     if (!canAdd) return
+    
+    // Generar un cartId basado en las opciones elegidas para permitir fusión de duplicados
+    const optionsKey = [
+      size?.id || '',
+      [...(selectedIngredients || [])].sort().join(','),
+      notes.trim().toLowerCase()
+    ].join('|')
+    
     const cartItem = {
-      cartId: `${item.id}-${Date.now()}`,
+      cartId: `${item.id}-${optionsKey}`,
       id: item.id,
       name: item.name,
       size: size?.label || null,
@@ -42,7 +50,7 @@ export function ProductModal({ item, category, onClose }) {
       quantity,
       finalPrice: isVariable ? 0 : finalPrice,
     }
-    addItem(cartItem)
+    ;(onAddToCart ?? storeAddItem)(cartItem)
     onClose()
   }
 

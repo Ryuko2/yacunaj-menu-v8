@@ -19,15 +19,31 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { table_number, qr_token, items, notes, source } = req.body || {}
+    const { table_number, qr_token, items, notes, source = 'qr' } = req.body || {}
 
     console.log('[create-order] incoming:', { table_number, qr_token, itemCount: items?.length, source })
+
+    // 1. Seguridad básica para CRM/Staff
+    if (source === 'crm' || source === 'staff') {
+      const authHeader = req.headers.authorization || ''
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
+      
+      if (!token) {
+        return res.status(401).json({ error: 'No autorizado', detail: 'Se requiere login para pedidos CRM' })
+      }
+      
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+      if (authError || !user) {
+        return res.status(401).json({ error: 'Sesión inválida', detail: authError?.message })
+      }
+    }
 
     if (!table_number || !qr_token) {
       return res.status(400).json({ error: 'Missing table_number or qr_token' })
     }
 
     const FALLBACK_TOKENS = {
+      0:'tok_crm_counter_yacunaj',
       1:'tok_t1_abc123',  2:'tok_t2_bcd234',  3:'tok_t3_cde345',
       4:'tok_t4_def456',  5:'tok_t5_efg567',  6:'tok_t6_fgh678',
       7:'tok_t7_ghi789',  8:'tok_t8_hij890',  9:'tok_t9_ijk901',
@@ -82,7 +98,8 @@ export default async function handler(req, res) {
         items,
         total,
         notes: notes || null,
-        status: 'pending'
+        status: 'pending',
+        source: source
       })
       .select()
       .single()

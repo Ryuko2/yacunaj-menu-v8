@@ -1,5 +1,13 @@
 import { supabase } from './_supabase.js'
 
+/**
+ * @deprecated  Endpoint legacy del menu QR original (autenticacion por PIN
+ *              hardcoded). El CMS completo de Phase 2 vive en
+ *              /backend/src/routes/menuCmsRoutes.js con autenticacion por
+ *              Supabase Auth + roles. Este handler solo se mantiene por
+ *              compatibilidad con el AdminPage legacy y se removera cuando
+ *              el frontend migre completamente al CMS nuevo.
+ */
 const ADMIN_PIN = 'yacunaj2025'
 
 export default async function handler(req, res) {

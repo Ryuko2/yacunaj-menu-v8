@@ -1,5 +1,8 @@
 -- Yacunaj Café & Gelato - Database Schema
 -- Run this in Supabase SQL Editor
+--
+-- Yacunaj OPS: el esquema completo evoluciona en /supabase/migrations/
+-- (ver 20260427100000_yacunaj_ops_phase1_catalog_auth.sql y siguientes).
 
 -- Tables (physical tables in the café)
 CREATE TABLE IF NOT EXISTS tables (
@@ -25,6 +28,7 @@ CREATE TABLE IF NOT EXISTS orders (
 
 -- Seed tables (tokens match api/create-order.js FALLBACK_TOKENS + Staff POS TOKENS)
 INSERT INTO tables (table_number, qr_token, active, label) VALUES
+  (0,  'tok_crm_counter_yacunaj', true, 'Mostrador (CRM)'),
   (1,  'tok_t1_abc123',   true, 'Mesa 1'),
   (2,  'tok_t2_bcd234',   true, 'Mesa 2'),
   (3,  'tok_t3_cde345',   true, 'Mesa 3'),

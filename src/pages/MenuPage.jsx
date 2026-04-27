@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { MenuHeader } from '../components/layout/MenuHeader'
 import { CategoryNav } from '../components/layout/CategoryNav'
 import { CartButton } from '../components/layout/CartButton'
@@ -56,6 +57,16 @@ export default function MenuPage() {
         <p style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.8rem', color: 'rgba(245,240,232,0.5)', marginTop: '1rem' }}>
           URL correcta: /order?table=1&token=tok_t1_abc123
         </p>
+        <p style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.85rem', color: 'rgba(245,240,232,0.55)', marginTop: '1.75rem' }}>
+          ¿Eres del personal?{' '}
+          <Link to="/admin" style={{ color: '#C9A227', textDecoration: 'underline' }}>
+            Admin (PIN)
+          </Link>
+          {' · '}
+          <Link to="/login" style={{ color: '#C9A227', textDecoration: 'underline' }}>
+            Inicio sesión CMS
+          </Link>
+        </p>
       </div>
     )
   }
@@ -104,6 +115,22 @@ export default function MenuPage() {
           onClose={() => { setModalProduct(null); setModalCategory(null) }}
         />
       )}
+
+      <Link
+        to="/admin"
+        style={{
+          position: 'fixed',
+          bottom: '0.65rem',
+          left: '0.75rem',
+          zIndex: 20,
+          fontFamily: '"Jost", sans-serif',
+          fontSize: '0.7rem',
+          color: 'rgba(245,240,232,0.35)',
+          textDecoration: 'none',
+        }}
+      >
+        Personal · administración
+      </Link>
     </div>
   )
 }

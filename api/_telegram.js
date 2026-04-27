@@ -32,11 +32,15 @@ export async function sendTelegramMessage(order, items) {
     hour: '2-digit', minute: '2-digit', hour12: true, timeZone: 'America/Mexico_City'
   })
 
-  const source = order.source === 'staff' ? '🧑‍🍳 *[STAFF]*' : '📱 *[CLIENTE QR]*'
+  const sourceLabel =
+    order.source === 'staff' ? '🧑‍🍳 *[STAFF]*'
+      : order.source === 'crm' ? '🖥️ *[CRM / MOSTRADOR]*'
+        : order.source ? `📍 *[${String(order.source).toUpperCase()}]*`
+          : '📱 *[CLIENTE QR]*'
 
   const message = [
     `🧾 *NUEVO PEDIDO — YACUNAJ*`,
-    source,
+    sourceLabel,
     ``,
     `🪑 *Mesa:* ${order.table_number}`,
     `📋 *Pedido #:* ${order.order_number}`,

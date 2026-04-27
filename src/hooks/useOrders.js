@@ -2,6 +2,12 @@ import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 import { getOrders } from '../lib/api'
 
+function normalizeOrdersPayload (raw) {
+  if (Array.isArray(raw)) return raw
+  if (raw && Array.isArray(raw.orders)) return raw.orders
+  return []
+}
+
 export function useOrders(statusFilter) {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -10,9 +16,10 @@ export function useOrders(statusFilter) {
     setLoading(true)
     try {
       const data = await getOrders(statusFilter)
-      setOrders(data)
+      setOrders(normalizeOrdersPayload(data))
     } catch (err) {
       console.error(err)
+      setOrders([])
     } finally {
       setLoading(false)
     }

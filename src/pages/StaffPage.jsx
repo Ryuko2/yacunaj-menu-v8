@@ -90,13 +90,9 @@ const MENU = [
   { id:'slch',  name:'Salchipulpos',          cat:'Snacks',    price:55, opts:[] },
 ]
 
+import { TABLE_QR_TOKENS as TOKENS } from '../lib/tableQrTokens'
+
 const CATEGORIES = [...new Set(MENU.map(i => i.cat))]
-const TOKENS = {
-  1:'tok_t1_abc123',  2:'tok_t2_bcd234',  3:'tok_t3_cde345',
-  4:'tok_t4_def456',  5:'tok_t5_efg567',  6:'tok_t6_fgh678',
-  7:'tok_t7_ghi789',  8:'tok_t8_hij890',  9:'tok_t9_ijk901',
-  10:'tok_t10_bcd890',
-}
 
 const C = {
   bg:'#0A1A0F', card:'#152B1A', light:'#1C3822',

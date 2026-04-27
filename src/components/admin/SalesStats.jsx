@@ -1,9 +1,10 @@
 export function SalesStats({ orders }) {
+  const list = Array.isArray(orders) ? orders : []
   const today = new Date().toISOString().slice(0, 10)
-  const todayOrders = orders.filter(o => o.created_at?.startsWith(today))
+  const todayOrders = list.filter(o => o.created_at?.startsWith(today))
   const totalRevenue = todayOrders.reduce((sum, o) => sum + Number(o.total), 0)
-  const pending = orders.filter(o => o.status === 'pending').length
-  const preparing = orders.filter(o => o.status === 'preparing').length
+  const pending = list.filter(o => o.status === 'pending').length
+  const preparing = list.filter(o => o.status === 'preparing').length
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

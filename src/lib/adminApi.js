@@ -5,14 +5,37 @@ function getAuthHeaders() {
   const pin = sessionStorage.getItem('admin_pin')
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${pin || ADMIN_PIN}`,
+    Authorization: `Bearer ${pin || ADMIN_PIN}`,
+  }
+}
+
+/** Evita `res.json()` cuando Vite/proxy devuelve HTML o un chunk JS (SyntaxError). */
+async function parseJsonResponse(res) {
+  const text = await res.text()
+  const trimmed = text.trim()
+  if (!trimmed) {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    return null
+  }
+  const first = trimmed[0]
+  if (first !== '{' && first !== '[') {
+    throw new Error(
+      `Respuesta no JSON (${res.status}). ¿Tienes el backend en :3001 y Vite con proxy?`,
+    )
+  }
+  try {
+    return JSON.parse(text)
+  } catch {
+    throw new Error('JSON inválido del servidor')
   }
 }
 
 export async function getMenuItems() {
   const res = await fetch(`${base}/api/admin-menu`, { headers: getAuthHeaders() })
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch')
-  return res.json()
+  const body = await parseJsonResponse(res)
+  if (!res.ok) throw new Error(body?.error || 'Failed to fetch')
+  if (!Array.isArray(body)) throw new Error('Formato inesperado (se esperaba una lista)')
+  return body
 }
 
 export async function createMenuItem(item) {
@@ -21,8 +44,9 @@ export async function createMenuItem(item) {
     headers: getAuthHeaders(),
     body: JSON.stringify(item),
   })
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to create')
-  return res.json()
+  const body = await parseJsonResponse(res)
+  if (!res.ok) throw new Error(body?.error || 'Failed to create')
+  return body
 }
 
 export async function updateMenuItem(id, updates) {
@@ -31,8 +55,9 @@ export async function updateMenuItem(id, updates) {
     headers: getAuthHeaders(),
     body: JSON.stringify({ id, ...updates }),
   })
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to update')
-  return res.json()
+  const body = await parseJsonResponse(res)
+  if (!res.ok) throw new Error(body?.error || 'Failed to update')
+  return body
 }
 
 export async function deleteMenuItem(id) {
@@ -40,8 +65,9 @@ export async function deleteMenuItem(id) {
     method: 'DELETE',
     headers: getAuthHeaders(),
   })
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to delete')
-  return res.json()
+  const body = await parseJsonResponse(res)
+  if (!res.ok) throw new Error(body?.error || 'Failed to delete')
+  return body
 }
 
 export async function uploadImage(file) {
@@ -60,7 +86,9 @@ export async function uploadImage(file) {
       contentType: file.type || 'image/jpeg',
     }),
   })
-  if (!res.ok) throw new Error((await res.json()).error || 'Failed to upload')
-  const { url } = await res.json()
+  const body = await parseJsonResponse(res)
+  if (!res.ok) throw new Error(body?.error || 'Failed to upload')
+  const { url } = body
+  if (!url) throw new Error('Sin URL en la respuesta')
   return url
 }
