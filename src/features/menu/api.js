@@ -1,7 +1,8 @@
 import { supabase } from '../../lib/supabase'
 
 function apiBase() {
-  return (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+  // En producción (Vercel), no usamos prefijo de dominio para evitar problemas de CORS y localhost
+  return ''
 }
 
 /**

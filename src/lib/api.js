@@ -6,8 +6,8 @@ const api = axios.create({
 })
 
 export async function placeOrder(tableNumber, qrToken, items, notes = '', source) {
-  const base = import.meta.env.VITE_API_URL || ''
-  const url = base ? `${base}/api/create-order` : '/api/create-order'
+  // En Vercel, usamos rutas relativas para evitar problemas de CORS/Mixed Content
+  const url = '/api/create-order'
   console.log('[placeOrder] sending:', { tableNumber, qrToken, itemCount: items.length, source })
 
   // Obtener token de Supabase si existe (para CRM/Staff)
