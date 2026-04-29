@@ -32,7 +32,7 @@ npm run dev
 ```
 
 Menú cliente: `http://localhost:5173/order?table=1&token=tok_t1_abc123`  
-Login staff: `http://localhost:5173/login` → magic link → `/app` → **Menú CMS** en `/app/menu/items`.
+Login staff: `http://localhost:5173/login` → contraseña OPS → `/app` → **Menú CMS** en `/app/menu/items`.
 
 ## Aplicar migraciones (Supabase)
 
@@ -104,7 +104,16 @@ Decisión detallada: [`docs/decisions/06-api-create-order-auth.md`](docs/decisio
 
 ### Yacunaj OPS — Login
 
-El login de OPS usa **email + contraseña** (`signInWithPassword`). Si tu cuenta se creó antes (solo magic link), usa **Restablecer contraseña** en `/login` para fijar una contraseña la primera vez. Las cuentas nuevas se crean en Supabase Auth (no hay signup público).
+Un solo campo de **contraseña** en `/login`. El correo del usuario staff no se muestra: debe coincidir con **`VITE_OPS_AUTH_EMAIL`** (Vercel + `.env`). No hay registro público ni flujo de reset en la app.
+
+**Primera vez / cambiar clave (local, con service role en `.env`):**
+
+```bash
+# En .env: VITE_OPS_AUTH_EMAIL, OPS_STAFF_PASSWORD (≥8 caracteres), SUPABASE_SERVICE_KEY
+npm run ops:ensure-staff
+```
+
+Esto crea el usuario en Auth si absent, fija la contraseña y deja `profiles.role = owner`. En producción, define también **`VITE_OPS_AUTH_EMAIL`** en el proyecto Vercel y vuelve a desplegar el front.
 
 ### Tests
 

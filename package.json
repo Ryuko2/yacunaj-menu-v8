@@ -15,6 +15,7 @@
     "test:backend": "npm --prefix backend test",
     "test:cart": "node --test tests/cartMerge.test.mjs",
     "setup:storage": "node scripts/setup-storage.mjs",
+    "ops:ensure-staff": "node scripts/fix-auth.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
