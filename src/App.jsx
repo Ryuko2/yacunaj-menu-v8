@@ -27,6 +27,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<MenuPage />} />
+        <Route path="/menu" element={<MenuPage />} />
         <Route path="/order" element={<MenuPage />} />
         <Route path="/confirmation" element={<ConfirmationPage />} />
         <Route path="/admin" element={<AdminPage />} />

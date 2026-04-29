@@ -1,27 +1,26 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useCartStore } from '../store/cartStore'
 
+/**
+ * Sincroniza mesa + token del QR con el carrito.
+ * Si faltan params → modo consulta (menú público sin QR); el checkout sigue bloqueado en OrderSummary.
+ */
 export function useTableValidation() {
-  const [status, setStatus] = useState('loading')
   const [searchParams] = useSearchParams()
-  const setTable = useCartStore(s => s.setTable)
+  const setTable = useCartStore((s) => s.setTable)
+
+  const table = searchParams.get('table')
+  const token = searchParams.get('token')
+  const browseOnly = !(table && token)
 
   useEffect(() => {
-    const table = searchParams.get('table')
-    const token = searchParams.get('token')
-
-    console.log('[TableValidation] table:', table, 'token:', token)
-
-    if (!table || !token) {
-      setStatus('invalid')
-      return
+    if (table && token) {
+      setTable(table, token)
+    } else {
+      setTable(null, null)
     }
+  }, [table, token, setTable])
 
-    setTable(table, token)
-    console.log('[TableValidation] setTable called ✅')
-    setStatus('valid')
-  }, [searchParams, setTable])
-
-  return status
+  return { browseOnly }
 }

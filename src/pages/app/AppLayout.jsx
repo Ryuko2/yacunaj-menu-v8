@@ -30,9 +30,13 @@ export default function AppLayout() {
   const navGroups = (
     <>
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-        <span className="font-accent text-xs uppercase tracking-wide text-[rgba(245,240,232,0.45)] md:mr-1">
+        <NavLink
+          to="/app/counter"
+          onClick={closeNav}
+          className="font-accent text-xs uppercase tracking-wide text-[rgba(245,240,232,0.55)] hover:text-[#C9A227] md:mr-1"
+        >
           Operación
-        </span>
+        </NavLink>
         <NavItem to="/app/counter" onClick={closeNav}>
           Mostrador
         </NavItem>
@@ -41,9 +45,13 @@ export default function AppLayout() {
         </NavItem>
       </div>
       <div className="flex flex-col gap-2 border-t border-[rgba(201,162,39,0.15)] pt-3 md:flex-row md:items-center md:gap-4 md:border-t-0 md:pt-0">
-        <span className="font-accent text-xs uppercase tracking-wide text-[rgba(245,240,232,0.45)] md:mr-1">
+        <NavLink
+          to="/app/menu/items"
+          onClick={closeNav}
+          className="font-accent text-xs uppercase tracking-wide text-[rgba(245,240,232,0.55)] hover:text-[#C9A227] md:mr-1"
+        >
           Menú
-        </span>
+        </NavLink>
         <NavItem to="/app/menu/items" onClick={closeNav}>
           Productos
         </NavItem>
@@ -58,9 +66,13 @@ export default function AppLayout() {
         </NavItem>
       </div>
       <div className="flex flex-col gap-2 border-t border-[rgba(201,162,39,0.15)] pt-3 md:flex-row md:items-center md:gap-4 md:border-t-0 md:pt-0">
-        <span className="font-accent text-xs uppercase tracking-wide text-[rgba(245,240,232,0.45)] md:mr-1">
+        <NavLink
+          to="/app/reports/sales"
+          onClick={closeNav}
+          className="font-accent text-xs uppercase tracking-wide text-[rgba(245,240,232,0.55)] hover:text-[#C9A227] md:mr-1"
+        >
           Reportes
-        </span>
+        </NavLink>
         <NavItem to="/app/reports/sales" onClick={closeNav}>
           Ventas
         </NavItem>
@@ -100,6 +112,15 @@ export default function AppLayout() {
             <nav className="hidden flex-wrap items-center gap-x-4 gap-y-2 md:flex">{navGroups}</nav>
 
             <Link
+              to="/menu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hidden font-accent text-sm ${linkPassive} md:inline`}
+              onClick={closeNav}
+            >
+              Menú cliente
+            </Link>
+            <Link
               to="/"
               className={`hidden font-accent text-sm ${linkPassive} sm:inline`}
               onClick={closeNav}
@@ -120,7 +141,23 @@ export default function AppLayout() {
         </div>
 
         {navOpen && (
-          <nav className="mx-auto mt-4 flex max-w-5xl flex-col gap-4 pb-2 md:hidden">{navGroups}</nav>
+          <nav className="mx-auto mt-4 flex max-w-5xl flex-col gap-4 pb-2 md:hidden">
+            {navGroups}
+            <div className="flex flex-col gap-2 border-t border-[rgba(201,162,39,0.15)] pt-3">
+              <Link
+                to="/menu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`font-accent text-sm ${linkPassive}`}
+                onClick={closeNav}
+              >
+                Menú cliente (nueva pestaña)
+              </Link>
+              <Link to="/" className={`font-accent text-sm ${linkPassive}`} onClick={closeNav}>
+                Menú público (inicio)
+              </Link>
+            </div>
+          </nav>
         )}
 
         {user?.email && (

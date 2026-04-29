@@ -31,7 +31,7 @@ npm run dev:backend
 npm run dev
 ```
 
-Menú cliente: `http://localhost:5173/order?table=1&token=tok_t1_abc123`  
+Menú cliente (sin QR): **`/menu`** o **`/`** — mismo catálogo; para confirmar pedido hace falta URL con `?table=&token=` (QR).
 Login staff: `http://localhost:5173/login` → contraseña OPS → `/app` → **Menú CMS** en `/app/menu/items`.
 
 ## Aplicar migraciones (Supabase)

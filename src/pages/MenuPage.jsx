@@ -14,7 +14,7 @@ import { menuCategories as staticCategories } from '../data/menu'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 
 export default function MenuPage() {
-  const status = useTableValidation()
+  const { browseOnly } = useTableValidation()
   const { categories: menuCategories, loading: menuLoading } = useMenuItems()
   const categories = (menuCategories?.length > 0 ? menuCategories : staticCategories)
   const [activeCategory, setActiveCategory] = useState(categories[0]?.id ?? 'food')
@@ -27,7 +27,7 @@ export default function MenuPage() {
     setModalCategory(category)
   }
 
-  if (status === 'loading' || menuLoading) {
+  if (menuLoading) {
     return (
       <div
         style={{
@@ -36,37 +36,6 @@ export default function MenuPage() {
         }}
       >
         <LoadingSpinner size="lg" />
-      </div>
-    )
-  }
-
-  if (status === 'invalid') {
-    return (
-      <div
-        style={{
-          minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          background: '#0A1A0F', padding: '1.5rem',
-        }}
-      >
-        <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.5rem', color: '#C9A227', marginBottom: '0.5rem' }}>
-          Acceso no válido
-        </h1>
-        <p style={{ fontFamily: '"Jost", sans-serif', color: 'rgba(245,240,232,0.7)', textAlign: 'center' }}>
-          Escanea el código QR de tu mesa para ver el menú.
-        </p>
-        <p style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.8rem', color: 'rgba(245,240,232,0.5)', marginTop: '1rem' }}>
-          URL correcta: /order?table=1&token=tok_t1_abc123
-        </p>
-        <p style={{ fontFamily: '"Jost", sans-serif', fontSize: '0.85rem', color: 'rgba(245,240,232,0.55)', marginTop: '1.75rem' }}>
-          ¿Eres del personal?{' '}
-          <Link to="/admin" style={{ color: '#C9A227', textDecoration: 'underline' }}>
-            Admin (PIN)
-          </Link>
-          {' · '}
-          <Link to="/login" style={{ color: '#C9A227', textDecoration: 'underline' }}>
-            Inicio sesión CMS
-          </Link>
-        </p>
       </div>
     )
   }
@@ -82,6 +51,30 @@ export default function MenuPage() {
       <FallingLeaves />
       <div style={{ position: 'relative', zIndex: 1 }}>
         <MenuHeader />
+
+        {browseOnly && (
+          <div
+            style={{
+              margin: '0 1rem 0.75rem',
+              padding: '0.6rem 0.75rem',
+              borderRadius: 6,
+              background: 'rgba(201,162,39,0.12)',
+              border: '1px solid rgba(201,162,39,0.28)',
+              fontFamily: '"Jost", sans-serif',
+              fontSize: '0.72rem',
+              lineHeight: 1.4,
+              color: 'rgba(245,240,232,0.88)',
+            }}
+          >
+            <strong style={{ color: '#C9A227' }}>Solo consulta.</strong>
+            {' '}
+            Para armar un pedido desde tu mesa, escanea el QR (te llevará con mesa y código).
+            {' '}
+            <Link to="/login" style={{ color: '#C9A227', textDecoration: 'underline' }}>Staff</Link>
+            {' · '}
+            <Link to="/menu" style={{ color: '#C9A227', textDecoration: 'underline' }}>Compartir menú</Link>
+          </div>
+        )}
 
         <div style={{ padding: '0 1rem 6rem' }}>
           <CategoryNav categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />

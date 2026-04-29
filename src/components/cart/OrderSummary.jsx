@@ -130,10 +130,11 @@ export function OrderSummary({ onClose }) {
 
   const total = getTotal()
   const hasVariableItems = items.some(i => i.finalPrice === 0)
+  const canCheckout = Boolean(tableNumber && qrToken)
 
   const handlePlaceOrder = async () => {
-    if (!tableNumber || !qrToken) {
-      setError('No se pudo validar la mesa. Escanea el QR nuevamente.')
+    if (!canCheckout) {
+      setError('Escanea el código QR de tu mesa para poder enviar el pedido.')
       return
     }
     setLoading(true)
@@ -222,7 +223,7 @@ export function OrderSummary({ onClose }) {
 
         <button
           onClick={handlePlaceOrder}
-          disabled={loading}
+          disabled={loading || !canCheckout}
           style={{
             width: '100%', padding: '1rem',
             background: 'linear-gradient(135deg, #C9A227, #D4AF37)',
@@ -230,12 +231,12 @@ export function OrderSummary({ onClose }) {
             color: '#0A1A0F', fontFamily: '"Jost", sans-serif',
             fontSize: '0.85rem', fontWeight: 600,
             letterSpacing: '0.15em', textTransform: 'uppercase',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            opacity: loading ? 0.7 : 1,
+            cursor: loading || !canCheckout ? 'not-allowed' : 'pointer',
+            opacity: loading ? 0.7 : !canCheckout ? 0.55 : 1,
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
           }}
         >
-          {loading ? <><LoadingSpinner size="sm" /> Enviando...</> : 'Confirmar Pedido'}
+          {loading ? <><LoadingSpinner size="sm" /> Enviando...</> : canCheckout ? 'Confirmar Pedido' : 'Escanea el QR para pedir'}
         </button>
       </div>
     </>

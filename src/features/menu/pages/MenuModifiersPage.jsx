@@ -28,13 +28,18 @@ export default function MenuModifiersPage() {
     }
   }
 
+  const tabBtn = (active) =>
+    active
+      ? 'cursor-pointer border-b-2 border-[#C9A227] pb-2 font-medium text-[#C9A227]'
+      : 'cursor-pointer pb-2 text-[rgba(245,240,232,0.78)] underline-offset-4 hover:text-[#C9A227] hover:underline'
+
   return (
     <div>
-      <div className="mb-4 flex gap-2 border-b border-[rgba(201,162,39,0.15)] font-accent text-sm">
-        <button type="button" className={tab === 'groups' ? 'border-b-2 border-[#C9A227] pb-2 text-[#C9A227]' : 'pb-2 text-[rgba(245,240,232,0.55)]'} onClick={() => setTab('groups')}>
+      <div className="mb-4 flex gap-6 border-b border-[rgba(201,162,39,0.15)] font-accent text-sm">
+        <button type="button" className={tabBtn(tab === 'groups')} onClick={() => setTab('groups')}>
           Grupos
         </button>
-        <button type="button" className={tab === 'opts' ? 'border-b-2 border-[#C9A227] pb-2 text-[#C9A227]' : 'pb-2 text-[rgba(245,240,232,0.55)]'} onClick={() => setTab('opts')}>
+        <button type="button" className={tabBtn(tab === 'opts')} onClick={() => setTab('opts')}>
           Opciones
         </button>
       </div>
@@ -57,6 +62,11 @@ export default function MenuModifiersPage() {
             ))}
           </ul>
         </div>
+      )}
+      {tab === 'opts' && groups.length === 0 && (
+        <p className="mb-3 font-accent text-xs text-[rgba(245,240,232,0.55)]">
+          Crea al menos un grupo en la pestaña «Grupos» para asignar opciones.
+        </p>
       )}
       {tab === 'opts' && (
         <div>
