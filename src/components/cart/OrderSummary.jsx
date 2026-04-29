@@ -163,7 +163,7 @@ export function OrderSummary({ onClose }) {
   }
 
   return (
-    <>
+    <div style={{ display: 'contents' }}>
       {successData && (
         <SuccessPopup
           orderNumber={successData.orderNumber}
@@ -247,6 +247,6 @@ export function OrderSummary({ onClose }) {
           )}
         </button>
       </div>
-    </>
+    </div>
   )
 }
