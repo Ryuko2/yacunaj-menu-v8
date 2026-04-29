@@ -236,7 +236,15 @@ export function OrderSummary({ onClose }) {
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
           }}
         >
-          {loading ? <><LoadingSpinner size="sm" /> Enviando...</> : canCheckout ? 'Confirmar Pedido' : 'Escanea el QR para pedir'}
+          {loading ? (
+            <>
+              <LoadingSpinner size="sm" /> Enviando...
+            </>
+          ) : canCheckout ? (
+            'Confirmar Pedido'
+          ) : (
+            'Escanea el QR para pedir'
+          )}
         </button>
       </div>
     </>
