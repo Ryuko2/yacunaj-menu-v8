@@ -1,5 +1,6 @@
-import { supabase } from './_supabase.js'
-import { sendTelegramMessage } from './_telegram.js'
+import { supabase } from '../_supabase.js'
+import { sendTelegramMessage } from '../_telegram.js'
+import { getStaffUserFromRequest } from '../_auth.js'
 
 function generateOrderNumber() {
   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '')
@@ -10,7 +11,7 @@ function generateOrderNumber() {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   res.setHeader('Content-Type', 'application/json')
 
   if (req.method === 'OPTIONS') return res.status(200).end()
@@ -23,31 +24,41 @@ export default async function handler(req, res) {
 
     console.log('[create-order] incoming:', { table_number, qr_token, itemCount: items?.length, source })
 
-    // 1. Seguridad básica para CRM/Staff
     if (source === 'crm' || source === 'staff') {
-      const authHeader = req.headers.authorization || ''
-      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
-      
-      if (!token) {
-        return res.status(401).json({ error: 'No autorizado', detail: 'Se requiere login para pedidos CRM' })
-      }
-      
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-      if (authError || !user) {
-        return res.status(401).json({ error: 'Sesión inválida', detail: authError?.message })
+      try {
+        await getStaffUserFromRequest(req)
+      } catch (err) {
+        if (err && typeof err.status === 'number') {
+          return res.status(err.status).json({ error: err.error, detail: err.detail })
+        }
+        throw err
       }
     }
 
-    if (!table_number || !qr_token) {
+    if (
+      table_number === undefined ||
+      table_number === null ||
+      table_number === '' ||
+      !qr_token
+    ) {
       return res.status(400).json({ error: 'Missing table_number or qr_token' })
+    }
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: 'Missing or empty items' })
     }
 
     const FALLBACK_TOKENS = {
-      0:'tok_crm_counter_yacunaj',
-      1:'tok_t1_abc123',  2:'tok_t2_bcd234',  3:'tok_t3_cde345',
-      4:'tok_t4_def456',  5:'tok_t5_efg567',  6:'tok_t6_fgh678',
-      7:'tok_t7_ghi789',  8:'tok_t8_hij890',  9:'tok_t9_ijk901',
-      10:'tok_t10_bcd890',
+      0: 'tok_crm_counter_yacunaj',
+      1: 'tok_t1_abc123',
+      2: 'tok_t2_bcd234',
+      3: 'tok_t3_cde345',
+      4: 'tok_t4_def456',
+      5: 'tok_t5_efg567',
+      6: 'tok_t6_fgh678',
+      7: 'tok_t7_ghi789',
+      8: 'tok_t8_hij890',
+      9: 'tok_t9_ijk901',
+      10: 'tok_t10_bcd890',
     }
 
     let tableValid = false
@@ -78,7 +89,7 @@ export default async function handler(req, res) {
       console.error('[create-order] INVALID token:', { table_number, qr_token })
       return res.status(403).json({
         error: 'Token inválido',
-        detail: `Mesa ${table_number} no reconocida. Escanea el QR de tu mesa.`
+        detail: `Mesa ${table_number} no reconocida. Escanea el QR de tu mesa.`,
       })
     }
 
@@ -99,7 +110,7 @@ export default async function handler(req, res) {
         total,
         notes: notes || null,
         status: 'pending',
-        source: source
+        source,
       })
       .select()
       .single()
@@ -116,14 +127,13 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       order_number,
-      order_id: order.id
+      order_id: order.id,
     })
-
   } catch (err) {
     console.error('[create-order] fatal error:', err)
     return res.status(500).json({
       error: 'Error al crear la orden',
-      detail: err.message
+      detail: err.message,
     })
   }
 }

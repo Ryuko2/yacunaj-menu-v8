@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useOrders } from '../hooks/useOrders'
 import { SalesStats } from '../components/admin/SalesStats'
 import { OrderCard } from '../components/admin/OrderCard'
 import { LoadingSpinner } from '../components/ui/LoadingSpinner'
 import * as adminApi from '../lib/adminApi'
+import { supabase } from '../lib/supabase'
+import { exportOrdersToCSV } from '../lib/exportCsv'
 
 const ADMIN_PIN = 'yacunaj2025'
 const CATEGORIES = [
@@ -35,19 +37,6 @@ const styles = {
   text: '#F5F0E8',
   muted: 'rgba(245,240,232,0.6)',
   border: 'rgba(201,162,39,0.2)',
-}
-
-function exportToCSV(orders) {
-  const list = Array.isArray(orders) ? orders : []
-  const headers = ['order_number', 'table_number', 'total', 'status', 'created_at']
-  const rows = list.map(o => [o.order_number, o.table_number, o.total, o.status, new Date(o.created_at).toLocaleString('es-MX')])
-  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const a = document.createElement('a')
-  a.href = URL.createObjectURL(blob)
-  a.download = `yacunaj-orders-${new Date().toISOString().slice(0, 10)}.csv`
-  a.click()
-  URL.revokeObjectURL(a.href)
 }
 
 function LoginScreen({ onLogin }) {
@@ -105,7 +94,7 @@ function LoginScreen({ onLogin }) {
   )
 }
 
-function MenuItemRow({ item, categories, onUpdate, onDelete }) {
+function MenuItemRow({ item, onUpdate }) {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ ...item })
   const [uploading, setUploading] = useState(false)
@@ -353,7 +342,7 @@ function MenuAdminTab() {
               {cat.name}
             </h3>
             {grouped[cat.id].map(item => (
-              <MenuItemRow key={item.id} item={item} categories={CATEGORIES} onUpdate={load} onDelete={load} />
+              <MenuItemRow key={item.id} item={item} onUpdate={load} />
             ))}
           </div>
         ))
@@ -363,20 +352,43 @@ function MenuAdminTab() {
 }
 
 export default function AdminPage() {
+  const navigate = useNavigate()
+  const [authChecked, setAuthChecked] = useState(false)
   const [loggedIn, setLoggedIn] = useState(false)
   const [activeTab, setActiveTab] = useState('pedidos')
   const [statusFilter, setStatusFilter] = useState(null)
   const { orders, loading, refetch } = useOrders(statusFilter)
 
   useEffect(() => {
-    if (sessionStorage.getItem('admin_pin') === ADMIN_PIN) {
-      setLoggedIn(true)
+    let cancelled = false
+    ;(async () => {
+      const { data } = await supabase.auth.getSession()
+      if (cancelled) return
+      if (data?.session) {
+        navigate('/app/orders', { replace: true })
+        return
+      }
+      setAuthChecked(true)
+      if (sessionStorage.getItem('admin_pin') === ADMIN_PIN) {
+        setLoggedIn(true)
+      }
+    })()
+    return () => {
+      cancelled = true
     }
-  }, [])
+  }, [navigate])
 
   const handleLogout = () => {
     sessionStorage.removeItem('admin_pin')
     setLoggedIn(false)
+  }
+
+  if (!authChecked) {
+    return (
+      <div style={{ minHeight: '100vh', background: styles.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <LoadingSpinner size="lg" />
+      </div>
+    )
   }
 
   if (!loggedIn) {
@@ -478,7 +490,7 @@ export default function AdminPage() {
             ))}
           </div>
           <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'flex-end' }}>
-            <button onClick={() => exportToCSV(orders)} style={{ padding: '0.5rem 1rem', background: 'rgba(201,162,39,0.15)', border: `1px solid ${styles.border}`, borderRadius: 4, color: styles.gold, fontSize: '0.8rem', cursor: 'pointer' }}>
+            <button onClick={() => exportOrdersToCSV(orders)} style={{ padding: '0.5rem 1rem', background: 'rgba(201,162,39,0.15)', border: `1px solid ${styles.border}`, borderRadius: 4, color: styles.gold, fontSize: '0.8rem', cursor: 'pointer' }}>
               Exportar CSV
             </button>
           </div>

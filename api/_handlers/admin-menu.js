@@ -1,4 +1,4 @@
-import { supabase } from './_supabase.js'
+import { supabase } from '../_supabase.js'
 
 /**
  * @deprecated  Endpoint legacy del menu QR original (autenticacion por PIN

@@ -7,6 +7,14 @@ if (!BOT_TOKEN || !CHAT_ID) {
   console.warn('[Telegram] Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID env vars')
 }
 
+/** Etiqueta corta para Markdown (pedidos CRM/STAFF). */
+function sourceTag(source) {
+  if (source === 'crm') return '*[CRM]*'
+  if (source === 'staff') return '*[STAFF]*'
+  if (source === 'admin') return '*[ADMIN]*'
+  return ''
+}
+
 function formatItems(items) {
   return items.map(item => {
     let line = `${item.quantity}x *${item.name}*`
@@ -30,12 +38,14 @@ async function sendTelegramMessage(order, items) {
     timeZone: 'America/Merida'
   })
 
-  const sourceLine = order.source
+  const tag = sourceTag(order.source)
+  const sourceLine = order.source && order.source !== 'qr'
     ? `\n📍 *Origen:* ${String(order.source).replace(/_/g, ' ')}`
     : ''
 
   const message = [
     `🧾 *NUEVO PEDIDO – YACUNAJ* 🌴`,
+    ...(tag ? [tag] : []),
     `_(Amor en Maya)_`,
     ``,
     `🪑 *Mesa:* ${order.table_number}${sourceLine}`,

@@ -1,0 +1,12 @@
+node_modules
+backend/node_modules
+.git
+.env
+.env.local
+.env.*.local
+_legacy_frontend
+.claude
+.agents
+supabase/.temp
+*.test.cjs
+backend/tests

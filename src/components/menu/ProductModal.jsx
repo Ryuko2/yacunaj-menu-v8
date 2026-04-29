@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCartStore } from '../../store/cartStore'
 import { CategoryIcon } from './CategoryIcon'
+import { buildCartId } from '../../lib/cartMerge'
 
 export function ProductModal({ item, category, onClose, onAddToCart }) {
   const storeAddItem = useCartStore(s => s.addItem)
@@ -32,16 +33,13 @@ export function ProductModal({ item, category, onClose, onAddToCart }) {
 
   const handleAddToCart = () => {
     if (!canAdd) return
-    
-    // Generar un cartId basado en las opciones elegidas para permitir fusión de duplicados
-    const optionsKey = [
-      size?.id || '',
-      [...(selectedIngredients || [])].sort().join(','),
-      notes.trim().toLowerCase()
-    ].join('|')
-    
+
     const cartItem = {
-      cartId: `${item.id}-${optionsKey}`,
+      cartId: buildCartId(item.id, {
+        sizeId: size?.id,
+        ingredients: selectedIngredients,
+        notes,
+      }),
       id: item.id,
       name: item.name,
       size: size?.label || null,

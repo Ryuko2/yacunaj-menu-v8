@@ -13,6 +13,7 @@
     "db:reset:local": "npx supabase db reset --local",
     "dev:backend": "npm --prefix backend run dev",
     "test:backend": "npm --prefix backend test",
+    "test:cart": "node --test tests/cartMerge.test.mjs",
     "setup:storage": "node scripts/setup-storage.mjs",
     "build": "vite build",
     "lint": "eslint .",
@@ -35,6 +36,7 @@
     "react-easy-crop": "^5.5.7",
     "react-hook-form": "^7.74.0",
     "react-router-dom": "^7.13.1",
+    "recharts": "^2.15.4",
     "sonner": "^2.0.7",
     "zod": "^4.3.6",
     "zustand": "^5.0.11"

@@ -1,4 +1,4 @@
-import { supabase } from './_supabase.js'
+import { supabase } from '../_supabase.js'
 
 const ADMIN_PIN = 'yacunaj2025'
 

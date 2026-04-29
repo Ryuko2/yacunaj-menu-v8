@@ -1,10 +1,8 @@
 import { createRequire } from 'node:module'
 import { createClient } from '@supabase/supabase-js'
 
-// El shared/ es CJS para que /backend (CJS) lo consuma sin esfuerzo.
-// Desde aqui (ESM) lo cargamos via createRequire — funciona en Node 18+ y en Vercel.
 const require = createRequire(import.meta.url)
-const { fetchMenuPublic } = require('../../shared/handlers/menuPublic.js')
+const { fetchMenuPublic } = require('../../../shared/handlers/menuPublic.js')
 
 function getAdminClient () {
   const url = process.env.SUPABASE_URL

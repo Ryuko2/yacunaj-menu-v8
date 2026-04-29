@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { mergeCartItems } from '../lib/cartMerge'
 
 export const useCartStore = create((set, get) => ({
   items: [],
@@ -8,13 +9,7 @@ export const useCartStore = create((set, get) => ({
 
   setTable: (tableNumber, qrToken) => set({ tableNumber, qrToken }),
 
-  addItem: (item) => set((state) => {
-    const existing = state.items.find(i => i.cartId === item.cartId)
-    if (existing) {
-      return { items: state.items.map(i => i.cartId === item.cartId ? { ...i, quantity: i.quantity + item.quantity } : i) }
-    }
-    return { items: [...state.items, item] }
-  }),
+  addItem: (item) => set((state) => ({ items: mergeCartItems(state.items, item) })),
 
   removeItem: (cartId) => set((state) => ({ items: state.items.filter(i => i.cartId !== cartId) })),
 

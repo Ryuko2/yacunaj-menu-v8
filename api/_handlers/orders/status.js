@@ -1,13 +1,15 @@
 import { supabase } from '../../_supabase.js'
 
-function getIdFromRequest(req) {
+function getIdFromRequest(req, ctx) {
+  const fromCtx = ctx?.params?.id
+  if (fromCtx) return fromCtx
   if (req.query && req.query.id) return req.query.id
   const url = req.url || ''
   const match = url.match(/\/api\/orders\/([^/]+)\/status/)
   return match ? match[1] : null
 }
 
-export default async function handler(req, res) {
+export default async function handler(req, res, ctx = {}) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'PATCH, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
@@ -19,7 +21,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const id = getIdFromRequest(req)
+    const id = getIdFromRequest(req, ctx)
     if (!id) return res.status(400).json({ error: 'Missing order id' })
 
     const body = req.body || {}

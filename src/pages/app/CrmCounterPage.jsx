@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CategoryNav } from '../../components/layout/CategoryNav'
 import { MenuSection } from '../../components/menu/MenuSection'
 import { MenuCard } from '../../components/menu/MenuCard'
 import { ProductModal } from '../../components/menu/ProductModal'
 import { LoadingSpinner } from '../../components/ui/LoadingSpinner'
 import { useMenuItems } from '../../hooks/useMenuItems'
+import { useFocusTrap } from '../../hooks/useFocusTrap'
 import { menuCategories as staticCategories } from '../../data/menu'
 import { TABLE_QR_TOKENS } from '../../lib/tableQrTokens'
+import { mergeCartItems } from '../../lib/cartMerge'
 import { placeOrder } from '../../lib/api'
 import { ShoppingBag, X, MessageSquare, Plus, Minus } from 'lucide-react'
 
@@ -32,6 +34,29 @@ export default function CrmCounterPage() {
   const [success, setSuccess] = useState(null)
   const [showCartMobile, setShowCartMobile] = useState(false)
 
+  const fabRef = useRef(null)
+  const cartSheetRef = useRef(null)
+
+  useFocusTrap(showCartMobile, cartSheetRef, { restoreFocusRef: fabRef })
+
+  useEffect(() => {
+    if (!showCartMobile) return undefined
+    const onKey = (e) => {
+      if (e.key === 'Escape') setShowCartMobile(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [showCartMobile])
+
+  useEffect(() => {
+    if (!showCartMobile) return undefined
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [showCartMobile])
+
   useEffect(() => {
     const first = categories[0]?.id
     if (first && !categories.find((c) => c.id === activeCategory)) {
@@ -45,15 +70,7 @@ export default function CrmCounterPage() {
   }
 
   const addFromModal = (cartItem) => {
-    setCart((prev) => {
-      const existing = prev.find((i) => i.cartId === cartItem.cartId)
-      if (existing) {
-        return prev.map((i) =>
-          i.cartId === cartItem.cartId ? { ...i, quantity: i.quantity + cartItem.quantity } : i
-        )
-      }
-      return [...prev, cartItem]
-    })
+    setCart((prev) => mergeCartItems(prev, cartItem))
   }
 
   const updateQty = (cartId, quantity) => {
@@ -78,7 +95,7 @@ export default function CrmCounterPage() {
     }
     setSubmitting(true)
     try {
-      const payload = cart.map(({ cartId: _c, ...rest }) => rest)
+      const payload = cart.map(({ cartId: _cartId, ...rest }) => rest)
       const { order_number: orderNumber } = await placeOrder(tableNumber, token, payload, kitchenNotes, 'crm')
       setSuccess(orderNumber)
       setCart([])
@@ -130,7 +147,7 @@ export default function CrmCounterPage() {
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  className="h-7 w-7 rounded flex items-center justify-center border border-[rgba(201,162,39,0.3)] text-[#C9A227] hover:bg-[rgba(201,162,39,0.1)] transition-colors"
+                  className="flex min-h-[36px] min-w-[36px] items-center justify-center rounded border border-[rgba(201,162,39,0.3)] text-[#C9A227] hover:bg-[rgba(201,162,39,0.1)] transition-colors md:h-7 md:w-7 md:min-h-0 md:min-w-0"
                   onClick={() => updateQty(item.cartId, item.quantity - 1)}
                 >
                   <Minus size={14} />
@@ -138,7 +155,7 @@ export default function CrmCounterPage() {
                 <span className="w-6 text-center font-medium">{item.quantity}</span>
                 <button
                   type="button"
-                  className="h-7 w-7 rounded flex items-center justify-center border border-[rgba(201,162,39,0.3)] text-[#C9A227] hover:bg-[rgba(201,162,39,0.1)] transition-colors"
+                  className="flex min-h-[36px] min-w-[36px] items-center justify-center rounded border border-[rgba(201,162,39,0.3)] text-[#C9A227] hover:bg-[rgba(201,162,39,0.1)] transition-colors md:h-7 md:w-7 md:min-h-0 md:min-w-0"
                   onClick={() => updateQty(item.cartId, item.quantity + 1)}
                 >
                   <Plus size={14} />
@@ -230,8 +247,8 @@ export default function CrmCounterPage() {
         )}
 
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-          <div className="space-y-6">
-            <div className="sticky top-0 z-10 bg-[#0A1A0F] py-2">
+          <div className="min-w-0 space-y-6">
+            <div className="sticky top-0 z-10 bg-[#0A1A0F] py-2 -mx-4 px-4 overflow-x-auto no-scrollbar">
               <CategoryNav categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
             </div>
             
@@ -267,7 +284,13 @@ export default function CrmCounterPage() {
             className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden"
             onClick={() => setShowCartMobile(false)}
           />
-          <div className="fixed bottom-0 left-0 right-0 z-[70] max-h-[85vh] rounded-t-2xl border-t border-[rgba(201,162,39,0.3)] bg-[#0D2010] p-6 lg:hidden animate-in slide-in-from-bottom duration-300">
+          <div
+            ref={cartSheetRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Pedido actual"
+            className="fixed bottom-0 left-0 right-0 z-[70] max-h-[85vh] rounded-t-2xl border-t border-[rgba(201,162,39,0.3)] bg-[#0D2010] p-6 lg:hidden animate-in slide-in-from-bottom duration-300"
+          >
             <div className="w-12 h-1.5 bg-[rgba(201,162,39,0.2)] rounded-full mx-auto mb-6" />
             <CartContent isMobile />
           </div>
@@ -277,6 +300,8 @@ export default function CrmCounterPage() {
       {/* Floating Action Button for Mobile */}
       {cart.length > 0 && !showCartMobile && (
         <button
+          ref={fabRef}
+          type="button"
           onClick={() => setShowCartMobile(true)}
           className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-full bg-[#C9A227] px-6 py-4 font-accent text-sm font-bold text-[#0A1A0F] shadow-2xl lg:hidden animate-in bounce-in duration-500"
         >

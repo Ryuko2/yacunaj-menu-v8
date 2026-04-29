@@ -13,7 +13,12 @@ import MenuItemEditPage from './features/menu/pages/MenuItemEditPage'
 import MenuModifiersPage from './features/menu/pages/MenuModifiersPage'
 import MenuPreviewPage from './features/menu/pages/MenuPreviewPage'
 import OpsHomePage from './pages/app/OpsHomePage'
+import OrdersAdminPage from './pages/app/OrdersAdminPage'
 import CrmCounterPage from './pages/app/CrmCounterPage'
+import SalesReportPage from './features/reports/pages/SalesReportPage'
+import CostsReportPage from './features/reports/pages/CostsReportPage'
+import InventoryReportPage from './features/inventory/pages/InventoryReportPage'
+import SuppliersPage from './features/inventory/pages/SuppliersPage'
 import TableActions from './components/TableActions'
 import { RequireAuth } from './components/auth/RequireAuth'
 
@@ -37,7 +42,12 @@ export default function App() {
         >
           <Route index element={<Navigate to="/app/pos" replace />} />
           <Route path="pos" element={<OpsHomePage />} />
+          <Route path="orders" element={<OrdersAdminPage />} />
           <Route path="counter" element={<CrmCounterPage />} />
+          <Route path="reports/sales" element={<SalesReportPage />} />
+          <Route path="reports/inventory" element={<InventoryReportPage />} />
+          <Route path="reports/inventory/suppliers" element={<SuppliersPage />} />
+          <Route path="reports/costs" element={<CostsReportPage />} />
           <Route path="menu" element={<MenuSectionLayout />}>
             <Route index element={<Navigate to="items" replace />} />
             <Route path="categories" element={<MenuCategoriesPage />} />

@@ -31,7 +31,6 @@ async function fetchMenuPublic (supabase, opts = {}) {
   try {
     const { data, error } = await supabase.rpc('get_menu_public_catalog', { p_at: at })
     if (error) {
-      // eslint-disable-next-line no-console
       console.error('[menuPublic] RPC error:', error)
       return {
         ok: false,
@@ -46,7 +45,6 @@ async function fetchMenuPublic (supabase, opts = {}) {
       body: payload ?? { categories: [] }
     }
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('[menuPublic] excepcion:', err)
     return {
       ok: false,

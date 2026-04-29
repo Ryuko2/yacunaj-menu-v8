@@ -139,7 +139,7 @@ export function OrderSummary({ onClose }) {
     setLoading(true)
     setError(null)
     try {
-      const payload = items.map(({ cartId, ...rest }) => rest)
+      const payload = items.map(({ cartId: _cartId, ...rest }) => rest)
       const { order_number } = await placeOrder(tableNumber, qrToken, payload, notes)
       setLastOrderNumber(order_number)
       clearCart()

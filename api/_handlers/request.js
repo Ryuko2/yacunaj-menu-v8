@@ -1,5 +1,5 @@
-import { supabase } from './_supabase.js'
-import { sendTelegramRawMessage } from './_telegram.js'
+import { supabase } from '../_supabase.js'
+import { sendTelegramRawMessage } from '../_telegram.js'
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
