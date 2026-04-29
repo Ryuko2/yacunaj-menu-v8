@@ -13,6 +13,9 @@ import MenuItemEditPage from './features/menu/pages/MenuItemEditPage'
 import MenuModifiersPage from './features/menu/pages/MenuModifiersPage'
 import MenuPreviewPage from './features/menu/pages/MenuPreviewPage'
 import OpsHomePage from './pages/app/OpsHomePage'
+import MenuHubPage from './pages/app/MenuHubPage'
+import ReportsHubPage from './pages/app/ReportsHubPage'
+import ReportsSectionLayout from './pages/app/ReportsSectionLayout'
 import OrdersAdminPage from './pages/app/OrdersAdminPage'
 import CrmCounterPage from './pages/app/CrmCounterPage'
 import SalesReportPage from './features/reports/pages/SalesReportPage'
@@ -41,16 +44,20 @@ export default function App() {
             </RequireAuth>
           )}
         >
-          <Route index element={<Navigate to="/app/pos" replace />} />
-          <Route path="pos" element={<OpsHomePage />} />
+          <Route index element={<Navigate to="/app/ops" replace />} />
+          <Route path="ops" element={<OpsHomePage />} />
+          <Route path="pos" element={<Navigate to="/app/ops" replace />} />
           <Route path="orders" element={<OrdersAdminPage />} />
           <Route path="counter" element={<CrmCounterPage />} />
-          <Route path="reports/sales" element={<SalesReportPage />} />
-          <Route path="reports/inventory" element={<InventoryReportPage />} />
-          <Route path="reports/inventory/suppliers" element={<SuppliersPage />} />
-          <Route path="reports/costs" element={<CostsReportPage />} />
+          <Route path="reports" element={<ReportsSectionLayout />}>
+            <Route index element={<ReportsHubPage />} />
+            <Route path="sales" element={<SalesReportPage />} />
+            <Route path="inventory" element={<InventoryReportPage />} />
+            <Route path="inventory/suppliers" element={<SuppliersPage />} />
+            <Route path="costs" element={<CostsReportPage />} />
+          </Route>
           <Route path="menu" element={<MenuSectionLayout />}>
-            <Route index element={<Navigate to="items" replace />} />
+            <Route index element={<MenuHubPage />} />
             <Route path="categories" element={<MenuCategoriesPage />} />
             <Route path="items" element={<MenuItemsPage />} />
             <Route path="items/new" element={<MenuItemNewPage />} />

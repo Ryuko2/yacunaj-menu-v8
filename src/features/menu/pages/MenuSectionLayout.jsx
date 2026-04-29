@@ -13,6 +13,9 @@ export default function MenuSectionLayout() {
       <aside className="w-full shrink-0 lg:w-52">
         <p className="mb-2 font-heading text-sm text-[#C9A227]">Menú</p>
         <nav className="flex flex-row flex-wrap gap-1 lg:flex-col">
+          <NavLink end to="/app/menu" className={linkCls}>
+            Resumen
+          </NavLink>
           <NavLink to="/app/menu/categories" className={linkCls}>
             Categorías
           </NavLink>

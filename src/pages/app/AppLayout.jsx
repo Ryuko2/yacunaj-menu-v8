@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, Link, useNavigate, useLocation } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
+import clsx from 'clsx'
 import { useAuth } from '../../hooks/useAuth'
 
 const linkBase = 'font-accent text-sm transition-colors'
@@ -20,6 +21,35 @@ function NavItem({ to, end, children, onClick }) {
   )
 }
 
+function OpsTabs() {
+  const { pathname } = useLocation()
+  const tab = pathname.startsWith('/app/menu')
+    ? 'menu'
+    : pathname.startsWith('/app/reports')
+      ? 'reports'
+      : 'ops'
+  const cls = (active) =>
+    clsx(
+      'rounded-t px-4 py-2 font-accent text-sm font-medium transition-colors border border-transparent',
+      active
+        ? 'border-[rgba(201,162,39,0.3)] border-b-0 bg-[rgba(201,162,39,0.1)] text-[#C9A227]'
+        : 'text-[rgba(245,240,232,0.55)] hover:text-[#C9A227]',
+    )
+  return (
+    <nav className="mx-auto -mb-px flex max-w-5xl gap-1 px-4" aria-label="Secciones OPS">
+      <Link to="/app/ops" className={cls(tab === 'ops')}>
+        Operación
+      </Link>
+      <Link to="/app/menu" className={cls(tab === 'menu')}>
+        Menú
+      </Link>
+      <Link to="/app/reports" className={cls(tab === 'reports')}>
+        Reportes
+      </Link>
+    </nav>
+  )
+}
+
 export default function AppLayout() {
   const { signOut, user } = useAuth()
   const navigate = useNavigate()
@@ -31,12 +61,15 @@ export default function AppLayout() {
     <>
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
         <NavLink
-          to="/app/counter"
+          to="/app/ops"
           onClick={closeNav}
           className="font-accent text-xs uppercase tracking-wide text-[rgba(245,240,232,0.55)] hover:text-[#C9A227] md:mr-1"
         >
           Operación
         </NavLink>
+        <NavItem to="/app/ops" onClick={closeNav}>
+          Panel
+        </NavItem>
         <NavItem to="/app/counter" onClick={closeNav}>
           Mostrador
         </NavItem>
@@ -46,7 +79,7 @@ export default function AppLayout() {
       </div>
       <div className="flex flex-col gap-2 border-t border-[rgba(201,162,39,0.15)] pt-3 md:flex-row md:items-center md:gap-4 md:border-t-0 md:pt-0">
         <NavLink
-          to="/app/menu/items"
+          to="/app/menu"
           onClick={closeNav}
           className="font-accent text-xs uppercase tracking-wide text-[rgba(245,240,232,0.55)] hover:text-[#C9A227] md:mr-1"
         >
@@ -67,12 +100,15 @@ export default function AppLayout() {
       </div>
       <div className="flex flex-col gap-2 border-t border-[rgba(201,162,39,0.15)] pt-3 md:flex-row md:items-center md:gap-4 md:border-t-0 md:pt-0">
         <NavLink
-          to="/app/reports/sales"
+          to="/app/reports"
           onClick={closeNav}
           className="font-accent text-xs uppercase tracking-wide text-[rgba(245,240,232,0.55)] hover:text-[#C9A227] md:mr-1"
         >
           Reportes
         </NavLink>
+        <NavItem to="/app/reports" end onClick={closeNav}>
+          Todos
+        </NavItem>
         <NavItem to="/app/reports/sales" onClick={closeNav}>
           Ventas
         </NavItem>
@@ -91,7 +127,7 @@ export default function AppLayout() {
       <header className="border-b border-[rgba(201,162,39,0.2)] px-4 py-3">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
           <Link
-            to="/app/pos"
+            to="/app/ops"
             className="font-heading text-lg text-[#C9A227]"
             onClick={closeNav}
           >
@@ -165,6 +201,7 @@ export default function AppLayout() {
             {user.email}
           </p>
         )}
+        <OpsTabs />
       </header>
       <main className="mx-auto max-w-5xl px-4 py-8">
         <Outlet />

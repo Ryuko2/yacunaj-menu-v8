@@ -26,6 +26,7 @@ import reportsCosts from './_handlers/reports/costs.js'
 import reportsItemsTop from './_handlers/reports/items_top.js'
 import reportsMarginsItems from './_handlers/reports/margins_items.js'
 import reportsMarginsLow from './_handlers/reports/margins_low.js'
+import { dispatchMenuCms } from './_handlers/menu/cms.js'
 
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
 
@@ -87,6 +88,7 @@ export default async function handler(req, res) {
     }
 
     if (route === 'menu/public') return menuPublic(req, res)
+    if (segs[0] === 'menu') return dispatchMenuCms(req, res, segs)
 
     if (route === 'reports/sales') return reportsSales(req, res)
     if (route === 'reports/costs') return reportsCosts(req, res)

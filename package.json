@@ -29,6 +29,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/react-query": "^5.100.5",
     "axios": "^1.13.6",
+    "busboy": "^1.6.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^1.11.0",
@@ -38,6 +39,7 @@
     "react-hook-form": "^7.74.0",
     "react-router-dom": "^7.13.1",
     "recharts": "^2.15.4",
+    "sharp": "^0.34.5",
     "sonner": "^2.0.7",
     "zod": "^4.3.6",
     "zustand": "^5.0.11"
